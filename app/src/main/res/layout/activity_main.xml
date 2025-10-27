@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="24dp"
-        tools:context=".MainActivity">
+        tools:context=".activity.MainActivity">
 
         <ImageView
             android:id="@+id/ivLogo"
@@ -81,10 +81,10 @@
         </RadioGroup>
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tilUserId"
+            android:id="@+id/tilUserName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Id người dùng"
+            android:hint="Username"
             app:boxBackgroundMode="outline"
             app:boxStrokeColor="@color/teal_700"
             app:hintTextColor="@color/teal_700"
@@ -95,13 +95,13 @@
             android:layout_marginTop="24dp">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/edtUserId"
+                android:id="@+id/edtUserName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="text"
                 android:textSize="16sp"
                 android:paddingStart="50dp"
-                android:contentDescription="UserId Input" />
+                android:contentDescription="UserName Input" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
@@ -117,7 +117,7 @@
             app:errorEnabled="true"
             app:startIconDrawable="@drawable/ic_lock"
             app:startIconTint="@color/teal_700"
-            app:layout_constraintTop_toBottomOf="@id/tilUserId"
+            app:layout_constraintTop_toBottomOf="@id/tilUserName"
             android:layout_marginTop="16dp">
 
             <com.google.android.material.textfield.TextInputEditText

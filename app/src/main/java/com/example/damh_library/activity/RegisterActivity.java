@@ -1,4 +1,4 @@
-package com.example.damh_library;
+package com.example.damh_library.activity;
 
 import android.app.DatePickerDialog;
 import android.content.Intent;
@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.damh_library.R;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;

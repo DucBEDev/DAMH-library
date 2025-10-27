@@ -1,3 +1,24 @@
 <resources>
     <string name="app_name">DAMH-Library</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="default_username">Người dùng 0</string>
+
+    <!-- Placeholders / accessibility -->
+    <string name="book_cover_cd">Ảnh bìa sách</string>
+    <string name="ic_person_cd">Biểu tượng người</string>
+    <string name="book_title_placeholder">Tên sách</string>
+    <string name="book_author_placeholder">Tác giả</string>
+    <string name="borrow_count_sample">125 lượt</string>
+    <string name="borrow_count_format">%d lượt</string>
+
+    <!-- HomeFragment sections -->
+    <string name="welcome_text">Xin chào!</string>
+    <string name="greeting_message">Chúc bạn có một ngày tốt lành!</string>
+    <string name="section_most_borrowed">📚 Sách được mượn nhiều nhất</string>
+    <string name="see_all">Xem tất cả &gt;</string>
+    <string name="section_popular_categories">🏷️ Thể loại phổ biến</string>
+    <string name="section_most_quantity">📖 Sách có sẵn nhiều nhất</string>
+    <string name="user_name_placeholder">Nguyễn Văn A</string>
 </resources>
