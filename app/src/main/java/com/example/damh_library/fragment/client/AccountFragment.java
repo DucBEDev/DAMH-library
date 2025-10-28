@@ -66,13 +66,23 @@ public class AccountFragment extends Fragment {
 
     private void setupListeners() {
         btnEditProfile.setOnClickListener(v -> {
-            // TODO: Navigate to Edit Profile Activity
-            Toast.makeText(getContext(), "Chỉnh sửa thông tin", Toast.LENGTH_SHORT).show();
+            EditClientProfileFragment editClientProfileFragment = new EditClientProfileFragment();
+
+            getActivity()
+                    .getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragmentClientDashboard, editClientProfileFragment)
+                    .addToBackStack(null)
+                    .commit();
         });
 
         layoutPersonalInfo.setOnClickListener(v -> {
-            // TODO: Navigate to Personal Info Activity
-            Toast.makeText(getContext(), "Thông tin cá nhân", Toast.LENGTH_SHORT).show();
+            ClientProfileFragment clientProfileFragment = new ClientProfileFragment();
+
+            getActivity()
+                    .getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragmentClientDashboard, clientProfileFragment)
+                    .addToBackStack(null)
+                    .commit();
         });
 
         layoutMyReaderCard.setOnClickListener(v -> {
