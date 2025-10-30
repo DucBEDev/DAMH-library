@@ -8,7 +8,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -86,8 +85,13 @@ public class AccountFragment extends Fragment {
         });
 
         layoutMyReaderCard.setOnClickListener(v -> {
-            // TODO: Navigate to Order History Activity
-            Toast.makeText(getContext(), "Thẻ độc giả của tôi", Toast.LENGTH_SHORT).show();
+            ReaderCardFragment readerCardFragment = new ReaderCardFragment();
+
+            getActivity()
+                    .getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragmentClientDashboard, readerCardFragment)
+                    .addToBackStack(null)
+                    .commit();
         });
 
         layoutFavCategory.setOnClickListener(v -> {

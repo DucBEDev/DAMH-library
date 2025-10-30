@@ -15,6 +15,10 @@ public interface ReaderApiService {
     @GET("admin/reader/profile-info")
     Call<ResponseSingleModel<ReaderProfileResponse>> getProfileInfo(@Query("id") int id);
 
+    // Lấy thông tin thẻ độc giả
+    @GET("admin/reader/card-info")
+    Call<ResponseSingleModel<com.example.damh_library.model.response.ReaderCardResponse>> getCardInfo(@Query("id") int id);
+
     @PATCH("admin/reader/update-profile/{id}")
     Call<ResponseSingleModel<ReaderProfileResponse>> updateProfile(@Path("id") int id, @Body UpdateClientProfileRequest request);
 }
