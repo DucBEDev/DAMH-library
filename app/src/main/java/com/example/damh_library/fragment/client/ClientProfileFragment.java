@@ -17,6 +17,7 @@ import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
 import com.example.damh_library.R;
+import com.example.damh_library.activity.MainActivity;
 import com.example.damh_library.model.response.ReaderProfileResponse;
 import com.example.damh_library.network.ApiClient;
 import com.example.damh_library.network.client.ReaderApiService;
@@ -76,7 +77,7 @@ public class ClientProfileFragment extends Fragment {
     }
 
     private void loadUserProfile() {
-        int userId = requireContext().getSharedPreferences("app_prefs", Context.MODE_PRIVATE).getInt("key_user_id", 2);
+        String userId = requireContext().getSharedPreferences("app_prefs", Context.MODE_PRIVATE).getString("key_userId", "2");
 
         ReaderApiService service = ApiClient.getClient().create(ReaderApiService.class);
         Call<ResponseSingleModel<ReaderProfileResponse>> call = service.getProfileInfo(userId);

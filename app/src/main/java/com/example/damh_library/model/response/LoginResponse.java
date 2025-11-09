@@ -9,13 +9,19 @@ public class LoginResponse {
     private String userType;
     @SerializedName("email")
     private String userEmail;
+    @SerializedName("id")
+    private String userId;
+    @SerializedName("dienThoai")
+    private String userPhone;
 
-    public LoginResponse(String message, boolean isSuccess, String userName, String userType, String userEmail) {
+    public LoginResponse(String message, boolean isSuccess, String userName, String userType, String userEmail, String userId, String userPhone) {
         this.message = message;
         this.isSuccess = isSuccess;
         this.userName = userName;
         this.userType = userType;
         this.userEmail = userEmail;
+        this.userId = userId;
+        this.userPhone = userPhone;
     }
 
     public String getMessage() {
@@ -56,5 +62,21 @@ public class LoginResponse {
 
     public void setUserEmail(String userEmail) {
         this.userEmail = userEmail;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public String getUserPhone() {
+        return userPhone;
+    }
+
+    public void setUserPhone(String userPhone) {
+        this.userPhone = userPhone;
     }
 }

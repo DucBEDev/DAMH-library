@@ -84,7 +84,7 @@ public class ReaderCardFragment extends Fragment {
     }
 
     private void fetchCardInfo() {
-        int userId = requireContext().getSharedPreferences("app_prefs", Context.MODE_PRIVATE).getInt("key_user_id", 2);
+        String userId = requireContext().getSharedPreferences("app_prefs", Context.MODE_PRIVATE).getString("key_userId", "2");
 
         ReaderApiService service = ApiClient.getClient().create(ReaderApiService.class);
         Call<ResponseSingleModel<ReaderCardResponse>> call = service.getCardInfo(userId);

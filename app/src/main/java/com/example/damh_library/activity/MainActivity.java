@@ -168,12 +168,13 @@ public class MainActivity extends AppCompatActivity {
                     LoginResponse loginResponse = response.body();
 
                     if (loginResponse.isSuccess()) {
-                        // Save username and userType to SharedPreferences so fragments can read it
                         SharedPreferences prefs = getSharedPreferences("app_prefs", MODE_PRIVATE);
                         prefs.edit()
                                 .putString("key_username", loginResponse.getUserName() != null ? loginResponse.getUserName() : "")
                                 .putString("key_userEmail", loginResponse.getUserEmail() != null ? loginResponse.getUserEmail() : "")
                                 .putString("key_userType", loginResponse.getUserType() != null ? loginResponse.getUserType() : "")
+                                .putString("key_userId", loginResponse.getUserId() != null ? loginResponse.getUserId() : "")
+                                .putString("key_userPhone", loginResponse.getUserPhone() != null ? loginResponse.getUserPhone() : "")
                                 .apply();
 
                         Intent intent;

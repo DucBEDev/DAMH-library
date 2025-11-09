@@ -259,7 +259,7 @@
                             android:id="@+id/tvIdCard"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="987654321"
+                            android:text="111"
                             android:textSize="16sp"
                             android:textColor="#333333"
                             android:textStyle="bold"

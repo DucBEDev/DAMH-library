@@ -347,7 +347,7 @@ public class EditClientProfileFragment extends Fragment {
 
         // Get user id from SharedPreferences
         SharedPreferences prefs = requireContext().getSharedPreferences("app_prefs", Context.MODE_PRIVATE);
-        int userId = prefs.getInt("key_user_id", 1);
+        String userId = prefs.getString("key_userId", "1");
 
         UpdateClientProfileRequest request = new UpdateClientProfileRequest(
                 fullName,
@@ -398,7 +398,7 @@ public class EditClientProfileFragment extends Fragment {
      }
 
     private void loadUserData() {
-        int userId = requireContext().getSharedPreferences("app_prefs", Context.MODE_PRIVATE).getInt("key_user_id", 2);
+        String userId = requireContext().getSharedPreferences("app_prefs", Context.MODE_PRIVATE).getString("key_userId", "2");
 
         ReaderApiService service = ApiClient.getClient().create(ReaderApiService.class);
         Call<ResponseSingleModel<ReaderProfileResponse>> call = service.getProfileInfo(userId);

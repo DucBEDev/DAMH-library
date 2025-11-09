@@ -95,8 +95,13 @@ public class AccountFragment extends Fragment {
         });
 
         layoutFavCategory.setOnClickListener(v -> {
-            // TODO: Navigate to Address Management Activity
-            Toast.makeText(getContext(), "Danh mục yêu thích", Toast.LENGTH_SHORT).show();
+            FavoriteBookFragment favoriteCategoryFragment = new FavoriteBookFragment();
+
+            getActivity()
+                    .getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragmentClientDashboard, favoriteCategoryFragment)
+                    .addToBackStack(null)
+                    .commit();
         });
 
         layoutPolicy.setOnClickListener(v -> {

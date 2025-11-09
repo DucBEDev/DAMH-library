@@ -2,6 +2,7 @@ package com.example.damh_library.network.client;
 
 import com.example.damh_library.model.ResponseSingleModel;
 import com.example.damh_library.model.response.ReaderProfileResponse;
+import com.example.damh_library.model.response.ReaderCardResponse;
 import com.example.damh_library.model.request.UpdateClientProfileRequest;
 
 import retrofit2.Call;
@@ -13,12 +14,11 @@ import retrofit2.http.Query;
 
 public interface ReaderApiService {
     @GET("admin/reader/profile-info")
-    Call<ResponseSingleModel<ReaderProfileResponse>> getProfileInfo(@Query("id") int id);
+    Call<ResponseSingleModel<ReaderProfileResponse>> getProfileInfo(@Query("id") String id);
 
-    // Lấy thông tin thẻ độc giả
     @GET("admin/reader/card-info")
-    Call<ResponseSingleModel<com.example.damh_library.model.response.ReaderCardResponse>> getCardInfo(@Query("id") int id);
+    Call<ResponseSingleModel<ReaderCardResponse>> getCardInfo(@Query("id") String id);
 
     @PATCH("admin/reader/update-profile/{id}")
-    Call<ResponseSingleModel<ReaderProfileResponse>> updateProfile(@Path("id") int id, @Body UpdateClientProfileRequest request);
+    Call<ResponseSingleModel<ReaderProfileResponse>> updateProfile(@Path("id") String id, @Body UpdateClientProfileRequest request);
 }
