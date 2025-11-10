@@ -105,13 +105,23 @@ public class AccountFragment extends Fragment {
         });
 
         layoutPolicy.setOnClickListener(v -> {
-            // TODO: Navigate to Help & Support Activity
-            Toast.makeText(getContext(), "Chính sách", Toast.LENGTH_SHORT).show();
+            PolicyFragment policyFragment = new PolicyFragment();
+
+            getActivity()
+                    .getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragmentClientDashboard, policyFragment)
+                    .addToBackStack(null)
+                    .commit();
         });
 
         layoutAbout.setOnClickListener(v -> {
-            // TODO: Navigate to About Activity
-            Toast.makeText(getContext(), "Về chúng tôi", Toast.LENGTH_SHORT).show();
+            AboutFragment aboutFragment = new AboutFragment();
+
+            getActivity()
+                    .getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragmentClientDashboard, aboutFragment)
+                    .addToBackStack(null)
+                    .commit();
         });
 
         btnLogout.setOnClickListener(v -> showLogoutDialog());

@@ -1,0 +1,30 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <!-- Nền trắng -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M0,0h24v24h-24z" />
+
+    <!-- Hình bo góc xanh dương -->
+    <path
+        android:fillColor="#0068FF"
+        android:pathData="M4,0h16c2.2,0 4,1.8 4,4v16c0,2.2 -1.8,4 -4,4h-16c-2.2,0 -4,-1.8 -4,-4v-16c0,-2.2 1.8,-4 4,-4z
+                          M4,1.5c-1.38,0 -2.5,1.12 -2.5,2.5v16c0,1.38 1.12,2.5 2.5,2.5h16c1.38,0 2.5,-1.12 2.5,-2.5v-16c0,-1.38 -1.12,-2.5 -2.5,-2.5h-16z" />
+
+    <!-- Bong bóng hội thoại trắng -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M5,4h10c2.76,0 5,2.24 5,5v5c0,2.76 -2.24,5 -5,5h-6l-4,3v-3c-1.66,0 -3,-1.34 -3,-3v-7c0,-2.76 2.24,-5 5,-5z" />
+
+    <!-- Chữ 'Zalo' -->
+    <path
+        android:fillColor="#0068FF"
+        android:pathData="M8,10h2.4l-2.4,3.2h2.5v0.8h-3.5v-0.8l2.4,-3.2h-2.4v-0.8h3.5v0.8z
+                          M12.2,13.2v-3.2h0.8v3.2h-0.8z
+                          M14,13.2v-0.8h1.5v0.8h-1.5z
+                          M17.2,13.2v-3.2h0.8v3.2h-0.8z" />
+</vector>
