@@ -131,7 +131,6 @@ public class EditClientProfileFragment extends Fragment {
         );
 
         Calendar maxDate = Calendar.getInstance();
-        maxDate.add(Calendar.YEAR, -10);
         datePickerDialog.getDatePicker().setMaxDate(maxDate.getTimeInMillis());
 
         datePickerDialog.show();

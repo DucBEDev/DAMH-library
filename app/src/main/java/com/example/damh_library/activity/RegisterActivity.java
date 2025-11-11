@@ -16,6 +16,10 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.damh_library.R;
+import com.example.damh_library.model.request.RegisterRequest;
+import com.example.damh_library.network.ApiClient;
+import com.example.damh_library.network.admin.AuthApiService;
+import com.example.damh_library.model.ResponseSingleModel;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
@@ -24,6 +28,11 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.regex.Pattern;
+
+import es.dmoral.toasty.Toasty;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -134,9 +143,7 @@ public class RegisterActivity extends AppCompatActivity {
                 year, month, day
         );
 
-        // Giới hạn ngày sinh (phải trên 16 tuổi)
         Calendar maxDate = Calendar.getInstance();
-        maxDate.add(Calendar.YEAR, -16);
         datePickerDialog.getDatePicker().setMaxDate(maxDate.getTimeInMillis());
 
         datePickerDialog.show();
@@ -229,12 +236,12 @@ public class RegisterActivity extends AppCompatActivity {
 
         // Validate CMND/CCCD
         String idCard = edtIdCard.getText().toString().trim();
-        Pattern idPattern = Pattern.compile("^[0-9]{9,12}$");
+        Pattern idPattern = Pattern.compile("^[0-9]{12}$");
         if (idCard.isEmpty()) {
             tilIdCard.setError("Vui lòng nhập số CMND/CCCD");
             isValid = false;
         } else if (!idPattern.matcher(idCard).matches()) {
-            tilIdCard.setError("Số CMND/CCCD không hợp lệ (9-12 số)");
+            tilIdCard.setError("Số CMND/CCCD không hợp lệ (12 số)");
             isValid = false;
         } else {
             tilIdCard.setError(null);
@@ -242,7 +249,7 @@ public class RegisterActivity extends AppCompatActivity {
 
         // Validate Checkbox điều khoản
         if (!cbTerms.isChecked()) {
-            Toast.makeText(this, "Vui lòng đồng ý với điều khoản và chính sách", Toast.LENGTH_SHORT).show();
+            Toasty.error(this, "Vui lòng đồng ý với điều khoản và chính sách", Toast.LENGTH_SHORT).show();
             isValid = false;
         }
 
@@ -263,19 +270,39 @@ public class RegisterActivity extends AppCompatActivity {
         String gender = "";
         int selectedGenderId = rgGender.getCheckedRadioButtonId();
         if (selectedGenderId == R.id.rbMale) {
-            gender = "Nam";
+            gender = "Male";
         } else if (selectedGenderId == R.id.rbFemale) {
-            gender = "Nữ";
+            gender = "Female";
         }
 
-        // TODO: Gọi API để đăng ký
-        // Ví dụ mẫu:
-        Toast.makeText(this, "Đăng ký thành công!\nChào mừng " + fullName, Toast.LENGTH_LONG).show();
+        // Gọi API để đăng ký
+        AuthApiService service = ApiClient.getClient().create(AuthApiService.class);
+        RegisterRequest request = new RegisterRequest(fullName, email, password, birthDate, address, phone, idCard, gender);
 
-        // Chuyển về màn hình đăng nhập
-        Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(intent);
-        finish();
+        Call<ResponseSingleModel<Object>> call = service.register(request);
+        call.enqueue(new Callback<ResponseSingleModel<Object>>() {
+            @Override
+            public void onResponse(Call<ResponseSingleModel<Object>> call, Response<ResponseSingleModel<Object>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    ResponseSingleModel<Object> body = response.body();
+                    if (body.isSuccess()) {
+                        Toasty.success(RegisterActivity.this, "Đăng ký thành công!", Toast.LENGTH_LONG).show();
+                        Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        startActivity(intent);
+                        finish();
+                    } else {
+                        Toasty.error(RegisterActivity.this, body.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    Toasty.error(RegisterActivity.this, "Đăng ký thất bại. Vui lòng thử lại.", Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseSingleModel<Object>> call, Throwable t) {
+                Toasty.error(RegisterActivity.this, "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
     }
 }

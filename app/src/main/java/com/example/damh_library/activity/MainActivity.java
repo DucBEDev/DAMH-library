@@ -90,15 +90,14 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // Xử lý quên mật khẩu
-//        tvForgotPassword.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                // Chuyển đến màn hình quên mật khẩu
-//                Intent intent = new Intent(LoginActivity.this, ForgotPasswordActivity.class);
-//                startActivity(intent);
-//            }
-//        });
-//
+        tvForgotPassword.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, ForgotPasswordActivity.class);
+                startActivity(intent);
+            }
+        });
+
         // Xử lý đăng ký
         tvRegister.setOnClickListener(new View.OnClickListener() {
             @Override
