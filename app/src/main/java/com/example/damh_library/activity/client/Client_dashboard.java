@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment;
 
 import com.example.damh_library.R;
 import com.example.damh_library.fragment.client.AccountFragment;
+import com.example.damh_library.fragment.client.BookListFragment;
 import com.example.damh_library.fragment.client.HomeFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -27,6 +28,9 @@ public class Client_dashboard extends AppCompatActivity {
                 selectedFragment = new HomeFragment();
             } else if (item.getItemId() == R.id.nav_profile) {
                 selectedFragment = new AccountFragment();
+            }
+            else if (item.getItemId() == R.id.nav_library) {
+                selectedFragment = new BookListFragment();
             }
 
             if (selectedFragment != null) {
