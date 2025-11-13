@@ -21,8 +21,8 @@ import com.example.damh_library.adapter.client.CategoryAdapter;
 import com.example.damh_library.model.response.MostBorrowBookResponse;
 import com.example.damh_library.network.ApiClient;
 import com.example.damh_library.model.ResponseModel;
-import com.example.damh_library.network.client.MostBorrowBookApiService;
-import com.example.damh_library.network.client.MostCategoryApiService;
+import com.example.damh_library.network.client.DauSachApiService;
+import com.example.damh_library.network.client.BookTypeApiService;
 import com.example.damh_library.model.response.TypeBorrowResponse;
 
 import java.util.ArrayList;
@@ -93,7 +93,7 @@ public class HomeFragment extends Fragment {
      }
 
      private void fetchTopCategories(int limit) {
-         MostCategoryApiService service = ApiClient.getClient().create(MostCategoryApiService.class);
+         BookTypeApiService service = ApiClient.getClient().create(BookTypeApiService.class);
          Call<ResponseModel<TypeBorrowResponse>> call = service.getMostBorrowedTypes(limit);
          call.enqueue(new Callback<ResponseModel<TypeBorrowResponse>>() {
              @Override
@@ -124,7 +124,7 @@ public class HomeFragment extends Fragment {
      }
 
      private void fetchMostBorrowed(int limit) {
-         MostBorrowBookApiService mostBorrowBookApiService = ApiClient.getClient().create(MostBorrowBookApiService.class);
+         DauSachApiService mostBorrowBookApiService = ApiClient.getClient().create(DauSachApiService.class);
          Call<ResponseModel<MostBorrowBookResponse>> call = mostBorrowBookApiService.getMostBorrowed(limit);
          call.enqueue(new Callback<ResponseModel<MostBorrowBookResponse>>() {
              @Override
@@ -176,7 +176,7 @@ public class HomeFragment extends Fragment {
      }
 
      private void fetchMostQuantity(int limit) {
-         MostBorrowBookApiService service = ApiClient.getClient().create(MostBorrowBookApiService.class);
+         DauSachApiService service = ApiClient.getClient().create(DauSachApiService.class);
          Call<ResponseModel<MostBorrowBookResponse>> call = service.getMostQuantity(limit);
          call.enqueue(new Callback<ResponseModel<MostBorrowBookResponse>>() {
              @Override
