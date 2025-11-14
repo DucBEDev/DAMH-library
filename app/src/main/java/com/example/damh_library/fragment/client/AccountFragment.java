@@ -10,7 +10,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -95,7 +94,7 @@ public class AccountFragment extends Fragment {
         });
 
         layoutFavCategory.setOnClickListener(v -> {
-            FavoriteBookFragment favoriteCategoryFragment = new FavoriteBookFragment();
+            BookCartFragment favoriteCategoryFragment = new BookCartFragment();
 
             getActivity()
                     .getSupportFragmentManager().beginTransaction()
