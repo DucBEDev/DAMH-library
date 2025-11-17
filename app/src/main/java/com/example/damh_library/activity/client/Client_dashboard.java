@@ -10,6 +10,7 @@ import com.example.damh_library.R;
 import com.example.damh_library.fragment.client.AccountFragment;
 import com.example.damh_library.fragment.client.BookListFragment;
 import com.example.damh_library.fragment.client.HomeFragment;
+import com.example.damh_library.fragment.client.CheckoutHistoryListFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class Client_dashboard extends AppCompatActivity {
@@ -31,6 +32,8 @@ public class Client_dashboard extends AppCompatActivity {
             }
             else if (item.getItemId() == R.id.nav_library) {
                 selectedFragment = new BookListFragment();
+            } else if (item.getItemId()==R.id.nav_borrowed) {
+                selectedFragment = new CheckoutHistoryListFragment();
             }
 
             if (selectedFragment != null) {

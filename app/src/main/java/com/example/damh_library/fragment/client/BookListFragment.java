@@ -21,7 +21,7 @@ import com.example.damh_library.adapter.client.MostBorrowBookAdapter;
 import com.example.damh_library.model.response.MostBorrowBookResponse;
 import com.example.damh_library.model.ResponseModel;
 import com.example.damh_library.network.ApiClient;
-import com.example.damh_library.network.client.MostBorrowBookApiService;
+import com.example.damh_library.network.client.DauSachApiService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -111,7 +111,7 @@ public class BookListFragment extends Fragment {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
-        MostBorrowBookApiService mostBorrowBookApiService = ApiClient.getClient().create(MostBorrowBookApiService.class);
+        DauSachApiService mostBorrowBookApiService = ApiClient.getClient().create(DauSachApiService.class);
         Call<ResponseModel<MostBorrowBookResponse>> call = mostBorrowBookApiService.getMostQuantity(FETCH_LIMIT);
 
         call.enqueue(new Callback<ResponseModel<MostBorrowBookResponse>>() {

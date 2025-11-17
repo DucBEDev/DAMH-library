@@ -1,12 +1,17 @@
 package com.example.damh_library.model.response;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import com.google.gson.annotations.SerializedName;
 import java.util.Objects;
 
-public class BookCartResponse {
+public class BookCartResponse implements Parcelable {
 
     @SerializedName("ISBN")
     private String isbn;
+
+    @SerializedName("maSach")
+    private String maSach;
 
     @SerializedName("title")
     private String title;
@@ -31,9 +36,10 @@ public class BookCartResponse {
     public BookCartResponse() {
     }
 
-    public BookCartResponse(String isbn, String title, String author, String publisher,
+    public BookCartResponse(String isbn, String maSach, String title, String author, String publisher,
                             String imageUrl, Integer soLuongKhaDung, String addedDate) {
         this.isbn = normalizeIsbn(isbn);
+        this.maSach = normalizeCode(maSach);
         this.title = title;
         this.author = author;
         this.publisher = publisher;
@@ -47,8 +53,14 @@ public class BookCartResponse {
         return raw.trim();
     }
 
-    public BookCartResponse(String isbn, String title, String author, String publisher, Integer soLuongKhaDung, String addedDate) {
+    private String normalizeCode(String raw) {
+        if (raw == null) return null;
+        return raw.trim();
+    }
+
+    public BookCartResponse(String isbn, String maSach, String title, String author, String publisher, Integer soLuongKhaDung, String addedDate) {
         this.isbn = isbn;
+        this.maSach = maSach;
         this.title = title;
         this.author = author;
         this.publisher = publisher;
@@ -56,12 +68,71 @@ public class BookCartResponse {
         this.addedDate = addedDate;
     }
 
+    // Parcelable implementation
+    protected BookCartResponse(Parcel in) {
+        isbn = in.readString();
+        maSach = in.readString();
+        title = in.readString();
+        author = in.readString();
+        publisher = in.readString();
+        imageUrl = in.readString();
+        if (in.readByte() == 0) {
+            soLuongKhaDung = null;
+        } else {
+            soLuongKhaDung = in.readInt();
+        }
+        addedDate = in.readString();
+    }
+
+    public static final Creator<BookCartResponse> CREATOR = new Creator<BookCartResponse>() {
+        @Override
+        public BookCartResponse createFromParcel(Parcel in) {
+            return new BookCartResponse(in);
+        }
+
+        @Override
+        public BookCartResponse[] newArray(int size) {
+            return new BookCartResponse[size];
+        }
+    };
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(isbn);
+        dest.writeString(maSach);
+        dest.writeString(title);
+        dest.writeString(author);
+        dest.writeString(publisher);
+        dest.writeString(imageUrl);
+        if (soLuongKhaDung == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeInt(soLuongKhaDung);
+        }
+        dest.writeString(addedDate);
+    }
+
+    // Getter và Setter (giữ nguyên như code cũ của bạn)
     public String getIsbn() {
         return isbn;
     }
 
     public void setIsbn(String isbn) {
         this.isbn = isbn;
+    }
+
+    public String getMaSach() {
+        return maSach;
+    }
+
+    public void setMaSach(String maSach) {
+        this.maSach = maSach;
     }
 
     public String getTitle() {
@@ -112,15 +183,15 @@ public class BookCartResponse {
         this.addedDate = addedDate;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        BookCartResponse that = (BookCartResponse) o;
-        String a = this.isbn != null ? this.isbn.trim() : null;
-        String b = that.isbn != null ? that.isbn.trim() : null;
-        return a != null && a.equals(b);
-    }
+//    @Override
+//    public boolean equals(Object o) {
+//        if (this == o) return true;
+//        if (o == null || getClass() != o.getClass()) return false;
+//        BookCartResponse that = (BookCartResponse) o;
+//        String a = this.isbn != null ? this.isbn.trim() : null;
+//        String b = that.isbn != null ? that.isbn.trim() : null;
+//        return a != null && a.equals(b);
+//    }
 
     @Override
     public int hashCode() {

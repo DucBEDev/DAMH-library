@@ -204,14 +204,20 @@ public class BookCartFragment extends Fragment {
     }
 
     private void createBorrowTicket(List<BookCartResponse> selectedBooks) {
-        // TODO: Call API to create borrow ticket
-        // dauSachApiService.createBorrowTicket(userId, bookIds).enqueue(callback);
+        if (selectedBooks.isEmpty()) {
+            Toasty.warning(requireContext(), "Vui lòng chọn sách để tạo phiếu mượn", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-        Toasty.success(requireContext(), "Đang tạo phiếu mượn cho " + selectedBooks.size() + " cuốn sách...", Toast.LENGTH_LONG).show();
+        // Open CreateCheckoutFragment and pass selected books
+        CreateCheckoutFragment fragment = new CreateCheckoutFragment(selectedBooks);
 
-        // Navigate to borrow ticket screen or refresh
-        // For now, just clear selection
-        adapter.deselectAll();
+        // Replace `R.id.fragment_container` with your actual container id (e.g. R.id.nav_host_fragment)
+        requireActivity().getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragmentClientDashboard, fragment)
+                .addToBackStack(null)
+                .commit();
     }
 
     private void updateSelectionUI(List<BookCartResponse> selectedBooks) {

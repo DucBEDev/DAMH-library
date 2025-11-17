@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Lưu vào res/layout/item_book_cart.xml -->
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/cardBook"
@@ -65,6 +64,22 @@
             app:layout_constraintStart_toEndOf="@id/cardCover"
             app:layout_constraintEnd_toStartOf="@id/btnRemove" />
 
+        <!-- Book ID (Mã sách) -->
+        <TextView
+            android:id="@+id/tvBookId"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="8dp"
+            android:text="Mã: MASACH123"
+            android:textSize="12sp"
+            android:textColor="@color/text_secondary"
+            android:fontFamily="monospace"
+            app:layout_constraintTop_toBottomOf="@id/tvBookTitle"
+            app:layout_constraintStart_toEndOf="@id/cardCover"
+            app:layout_constraintEnd_toStartOf="@id/btnRemove" />
+
         <!-- Author -->
         <TextView
             android:id="@+id/tvAuthor"
@@ -81,7 +96,7 @@
             android:drawableStart="@drawable/ic_person"
             android:drawablePadding="4dp"
             app:drawableTint="@color/teal_500"
-            app:layout_constraintTop_toBottomOf="@id/tvBookTitle"
+            app:layout_constraintTop_toBottomOf="@id/tvBookId"
             app:layout_constraintStart_toEndOf="@id/cardCover"
             app:layout_constraintEnd_toStartOf="@id/btnRemove" />
 

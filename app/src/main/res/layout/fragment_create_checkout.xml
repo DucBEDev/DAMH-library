@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/checkoutSlipRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
-    tools:context=".fragment.client.CheckoutSlipFragment">
+    tools:context=".fragment.client.CreateCheckoutFragment">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -19,7 +19,7 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- Header -->
+            <!-- HEADER ĐẸP -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="140dp"
@@ -27,23 +27,21 @@
                 android:padding="16dp"
                 android:gravity="center_vertical"
                 android:background="@drawable/gradient_library_header"
-                android:layout_marginBottom="12dp"
-                android:clipToPadding="false"
-                android:clipChildren="false">
+                android:layout_marginBottom="16dp">
 
                 <ImageView
                     android:layout_width="72dp"
                     android:layout_height="72dp"
                     android:src="@drawable/ic_book_borrow"
                     android:contentDescription="@null"
-                    android:layout_marginEnd="12dp"
                     app:tint="@android:color/white" />
 
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:layout_weight="1">
+                    android:layout_weight="1"
+                    android:layout_marginStart="12dp">
 
                     <TextView
                         android:id="@+id/tvCheckoutTitle"
@@ -51,86 +49,119 @@
                         android:layout_height="wrap_content"
                         android:text="Phiếu mượn"
                         android:textColor="@android:color/white"
-                        android:textSize="20sp"
+                        android:textSize="22sp"
                         android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/tvCheckoutSubtitle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Thông tin phiếu mượn"
+                        android:text="Xác nhận thông tin mượn sách"
                         android:textColor="@android:color/white"
                         android:textSize="14sp"
                         android:layout_marginTop="4dp" />
                 </LinearLayout>
             </LinearLayout>
 
-            <!-- Card / main info -->
+            <!-- CARD CHÍNH -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp">
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="6dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="12dp">
+                    android:padding="16dp">
 
-                    <!-- Row: MADG + reader name (không cho chỉnh sửa, giữ nguyên TextView read-only) -->
+                    <!-- 1. Thông tin độc giả -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:gravity="center_vertical">
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="12dp">
 
                         <ImageView
                             android:layout_width="28dp"
                             android:layout_height="28dp"
                             android:src="@drawable/ic_person"
-                            android:contentDescription="@null"
-                            app:tint="@color/black" />
+                            app:tint="@color/teal_700" />
 
                         <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:orientation="vertical"
                             android:layout_weight="1"
-                            android:paddingStart="12dp">
+                            android:layout_marginStart="12dp">
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Độc giả"
                                 android:textSize="13sp"
-                                android:textColor="@android:color/black" />
+                                android:textColor="#555" />
 
                             <TextView
                                 android:id="@+id/tvReaderName"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="—"
-                                android:textSize="14sp"
-                                android:textColor="@android:color/darker_gray" />
+                                android:text="Nguyễn Văn A"
+                                android:textSize="16sp"
+                                android:textStyle="bold"
+                                android:textColor="@android:color/black" />
                         </LinearLayout>
 
                         <TextView
                             android:id="@+id/tvReaderId"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="ID —"
-                            android:textSize="13sp"
-                            android:textColor="@android:color/darker_gray"
-                            android:layout_marginStart="8dp" />
+                            android:text="DG001"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/teal_700" />
                     </LinearLayout>
 
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="#EFEFEF"
-                        android:layout_marginVertical="8dp" />
+                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#EEEEEE" />
 
-                    <!-- Row: HINHTHUC -->
+                    <!-- 3. Ngày lập phiếu -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginTop="16dp">
+
+                        <ImageView
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:src="@drawable/ic_calendar"
+                            app:tint="@color/teal_700" />
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Ngày lập"
+                            android:textSize="14sp"
+                            android:textColor="#555"
+                            android:layout_marginStart="12dp" />
+
+                        <TextView
+                            android:id="@+id/tvDate"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="17/11/2025"
+                            android:textSize="15sp"
+                            android:textStyle="bold"
+                            android:textColor="@android:color/black" />
+                    </LinearLayout>
+                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#EEEEEE" android:layout_marginVertical="16dp" />
+                    <!-- 2. Hình thức mượn (Segmented Buttons - từ layout 1) -->
+
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="48dp"
@@ -142,7 +173,7 @@
                             android:layout_height="28dp"
                             android:src="@drawable/ic_book_borrow"
                             android:contentDescription="@null"
-                            app:tint="@color/black" />
+                            app:tint="@color/teal_700" />
 
                         <TextView
                             android:layout_width="0dp"
@@ -153,133 +184,115 @@
                             android:textSize="14sp"
                             android:textColor="@android:color/black" />
 
-                        <TextView
-                            android:id="@+id/tvMethod"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Tại thư viện"
-                            android:textSize="14sp"
-                            android:textColor="@android:color/darker_gray" />
                     </LinearLayout>
 
-                    <View
+                    <com.google.android.material.button.MaterialButtonToggleGroup
+                        android:id="@+id/toggleGroupBorrowType"
                         android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="#EFEFEF"
-                        android:layout_marginVertical="8dp" />
+                        android:layout_height="wrap_content"
+                        app:singleSelection="true"
+                        app:selectionRequired="true"
+                        app:checkedButton="@id/btnInPlace">
 
-                    <!-- Row: NGAYLAP (giữ nguyên, đổi text thành "Ngày lập" thay vì "Ngày mượn") -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="48dp"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical">
-
-                        <ImageView
-                            android:layout_width="28dp"
-                            android:layout_height="28dp"
-                            android:src="@drawable/ic_calendar"
-                            android:contentDescription="@null"
-                            app:tint="@color/black" />
-
-                        <TextView
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnInPlace"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                             android:layout_width="0dp"
-                            android:layout_height="wrap_content"
+                            android:layout_height="56dp"
                             android:layout_weight="1"
-                            android:paddingStart="12dp"
-                            android:text="Ngày lập"
-                            android:textSize="14sp"
-                            android:textColor="@android:color/black" />
+                            android:text="Mượn tại chỗ"
+                            android:textSize="15sp"
+                            android:textStyle="bold"
+                            app:cornerRadius="12dp"
+                            app:strokeWidth="2dp"
+                            app:strokeColor="?attr/colorPrimary" />
 
-                        <TextView
-                            android:id="@+id/tvDate"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="—"
-                            android:textSize="14sp"
-                            android:textColor="@android:color/darker_gray" />
-                    </LinearLayout>
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnTakeHome"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            android:layout_width="0dp"
+                            android:layout_height="56dp"
+                            android:layout_weight="1"
+                            android:text="Mang về"
+                            android:textSize="15sp"
+                            android:textStyle="bold"
+                            app:cornerRadius="12dp"
+                            app:strokeWidth="2dp"
+                            app:strokeColor="?attr/colorPrimary" />
 
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="#EFEFEF"
-                        android:layout_marginVertical="10dp" />
+                    </com.google.android.material.button.MaterialButtonToggleGroup>
 
-                    <!-- Borrowed books header -->
+                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#EEEEEE" android:layout_marginVertical="16dp" />
+
+                    <!-- 4. Danh sách sách mượn -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:gravity="center_vertical"
-                        android:paddingBottom="8dp">
+                        android:layout_marginBottom="12dp">
 
                         <TextView
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="Danh sách sách mượn"
-                            android:textSize="15sp"
-                            android:textStyle="bold"
-                            android:textColor="@android:color/black" />
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
 
                         <TextView
                             android:id="@+id/tvTotalBooks"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="0 cuốn"
-                            android:textSize="13sp"
-                            android:textColor="@android:color/darker_gray" />
+                            android:text="5 cuốn"
+                            android:textSize="14sp"
+                            android:textColor="@color/teal_700"
+                            android:textStyle="bold" />
                     </LinearLayout>
 
-                    <!-- RecyclerView for CT_PHIEUMUON details (MASACH, NGAYTRA, TINHTRANGMUON, TRA, MANVNS) -->
+                    <!-- RecyclerView hiển thị chi tiết sách -->
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/rvSlipDetails"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:nestedScrollingEnabled="false"
                         android:overScrollMode="never"
-                        android:clipToPadding="false" />
-
-                    <TextView
-                        android:id="@+id/tvNote"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text=""
-                        android:textSize="13sp"
-                        android:textColor="@android:color/darker_gray"
+                        android:clipToPadding="false"
                         android:layout_marginTop="8dp" />
+
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
-            <!-- Action buttons -->
+            <!-- NÚT HÀNH ĐỘNG -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="end"
-                android:weightSum="2">
+                android:layout_marginTop="8dp">
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnCancel"
                     style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                     android:layout_width="0dp"
-                    android:layout_height="48dp"
+                    android:layout_height="52dp"
                     android:layout_weight="1"
-                    android:text="Hủy"
-                    android:layout_marginEnd="8dp" />
+                    android:text="Hủy bỏ"
+                    android:layout_marginEnd="8dp"
+                    app:cornerRadius="12dp" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnConfirmBorrow"
                     style="@style/Widget.MaterialComponents.Button"
                     android:layout_width="0dp"
-                    android:layout_height="48dp"
+                    android:layout_height="52dp"
                     android:layout_weight="1"
                     android:text="Xác nhận mượn"
-                    app:cornerRadius="6dp" />
+                    app:cornerRadius="12dp"
+                    app:iconGravity="textStart" />
             </LinearLayout>
 
-            <View android:layout_width="match_parent" android:layout_height="18dp" />
+            <View android:layout_width="match_parent" android:layout_height="20dp" />
         </LinearLayout>
     </ScrollView>
 </FrameLayout>

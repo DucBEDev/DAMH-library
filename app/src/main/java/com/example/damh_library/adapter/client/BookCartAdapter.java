@@ -54,6 +54,14 @@ public class BookCartAdapter extends RecyclerView.Adapter<BookCartAdapter.CartVi
 
         // Set book information
         holder.tvBookTitle.setText(book.getTitle() != null ? book.getTitle() : "Không có tên");
+
+        // Book ID (mã sách) - adjust getter if your model uses different name
+        String maSach = null;
+        try {
+            maSach = book.getMaSach();
+        } catch (Exception ignored) { }
+        holder.tvBookId.setText("Mã: " + (maSach != null ? maSach : "N/A"));
+
         holder.tvAuthor.setText(book.getAuthor() != null ? book.getAuthor() : "Chưa rõ tác giả");
         holder.tvPublisher.setText(book.getPublisher() != null ? book.getPublisher() : "Chưa rõ NXB");
         holder.tvISBN.setText("ISBN: " + (book.getIsbn() != null ? book.getIsbn() : "N/A"));
@@ -105,6 +113,7 @@ public class BookCartAdapter extends RecyclerView.Adapter<BookCartAdapter.CartVi
             if (availableCount > 0) {
                 holder.cbSelectBook.setChecked(!holder.cbSelectBook.isChecked());
             }
+            if (listener != null) listener.onBookClick(book);
         });
 
         // Remove button
@@ -164,7 +173,7 @@ public class BookCartAdapter extends RecyclerView.Adapter<BookCartAdapter.CartVi
         MaterialCardView cardBook;
         CheckBox cbSelectBook;
         ImageView ivBookCover;
-        TextView tvBookTitle, tvAuthor, tvPublisher, tvISBN, tvAvailableCount;
+        TextView tvBookTitle, tvBookId, tvAuthor, tvPublisher, tvISBN, tvAvailableCount;
         ImageButton btnRemove;
 
         public CartViewHolder(@NonNull View itemView) {
@@ -174,6 +183,7 @@ public class BookCartAdapter extends RecyclerView.Adapter<BookCartAdapter.CartVi
             cbSelectBook = itemView.findViewById(R.id.cbSelectBook);
             ivBookCover = itemView.findViewById(R.id.ivBookCover);
             tvBookTitle = itemView.findViewById(R.id.tvBookTitle);
+            tvBookId = itemView.findViewById(R.id.tvBookId);
             tvAuthor = itemView.findViewById(R.id.tvAuthor);
             tvPublisher = itemView.findViewById(R.id.tvPublisher);
             tvISBN = itemView.findViewById(R.id.tvISBN);

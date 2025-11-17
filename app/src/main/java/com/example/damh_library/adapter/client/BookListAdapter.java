@@ -7,14 +7,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.damh_library.R;
-import com.example.damh_library.fragment.client.CheckoutSlipFragment;
-import com.example.damh_library.fragment.client.EditClientProfileFragment;
 import com.example.damh_library.model.response.MostBorrowBookResponse;
 import com.google.android.material.button.MaterialButton;
 
@@ -59,16 +55,16 @@ public class BookListAdapter extends RecyclerView.Adapter<BookListAdapter.BookVi
             holder.ivBookCover.setImageResource(R.drawable.ic_book);
         }
 
-        holder.btnBorrow.setOnClickListener(v -> {
-            if (holder.itemView.getContext() instanceof AppCompatActivity) {
-                CheckoutSlipFragment fragment = new CheckoutSlipFragment();
-                AppCompatActivity activity = (AppCompatActivity) holder.itemView.getContext();
-                FragmentTransaction ft = activity.getSupportFragmentManager().beginTransaction();
-                ft.replace(R.id.fragmentClientDashboard, fragment);
-                ft.addToBackStack(null);
-                ft.commit();
-            }
-        });
+//        holder.btnBorrow.setOnClickListener(v -> {
+//            if (holder.itemView.getContext() instanceof AppCompatActivity) {
+//                CheckoutSlipFragment fragment = new CheckoutSlipFragment();
+//                AppCompatActivity activity = (AppCompatActivity) holder.itemView.getContext();
+//                FragmentTransaction ft = activity.getSupportFragmentManager().beginTransaction();
+//                ft.replace(R.id.fragmentClientDashboard, fragment);
+//                ft.addToBackStack(null);
+//                ft.commit();
+//            }
+//        });
 
     }
 
