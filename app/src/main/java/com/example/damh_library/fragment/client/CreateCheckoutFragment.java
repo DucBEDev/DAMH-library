@@ -1,5 +1,7 @@
 package com.example.damh_library.fragment.client;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,7 +16,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.damh_library.R;
 import com.example.damh_library.adapter.client.SelectedBookCheckoutAdapter;
+import com.example.damh_library.model.ResponseModel;
+import com.example.damh_library.model.ResponseSingleModel;
+import com.example.damh_library.model.request.PhieuMuonRequest;
 import com.example.damh_library.model.response.BookCartResponse;
+import com.example.damh_library.model.response.ReaderProfileResponse;
+import com.example.damh_library.network.ApiClient;
+import com.example.damh_library.network.client.CheckoutSlipApiService;
+import com.example.damh_library.network.client.ReaderApiService;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.button.MaterialButtonToggleGroup;
 
@@ -24,6 +33,9 @@ import java.util.List;
 import java.util.Locale;
 
 import es.dmoral.toasty.Toasty;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class CreateCheckoutFragment extends Fragment {
 
@@ -85,11 +97,7 @@ public class CreateCheckoutFragment extends Fragment {
             }
 
             // TODO: Gọi API tạo phiếu mượn ở đây
-            Toasty.success(requireContext(),
-                    isTakeHome ? "Đã tạo phiếu mượn mang về thành công!" : "Đã tạo phiếu mượn tại chỗ!",
-                    Toasty.LENGTH_LONG).show();
-
-            requireActivity().onBackPressed();
+            callCreatePhieuMuonApi(isTakeHome);
         });
 
         return view;
@@ -138,6 +146,35 @@ public class CreateCheckoutFragment extends Fragment {
                 Toasty.warning(requireContext(),
                         "Không thể chọn mang về khi quá 3 cuốn!", Toasty.LENGTH_LONG).show();
                 toggleGroupBorrowType.check(R.id.btnInPlace);
+            }
+        });
+    }
+
+    private void callCreatePhieuMuonApi(boolean hinhThuc) {
+        SharedPreferences prefs = requireContext().getSharedPreferences("app_prefs", Context.MODE_PRIVATE);
+        long maDG = Long.parseLong(prefs.getString("key_userId", "0")); // Lấy maDG
+        long maNV = 4; // Giả định maNV (thủ thư)
+
+        PhieuMuonRequest request = new PhieuMuonRequest( maDG, hinhThuc, maNV, selectedBooks);
+        CheckoutSlipApiService service = ApiClient.getClient().create(CheckoutSlipApiService.class);
+        Call<ResponseModel<Void>> call = service.createCheckout(request);
+        call.enqueue(new Callback<ResponseModel<Void>>() {
+            @Override
+            public void onResponse(Call<ResponseModel<Void>> call, Response<ResponseModel<Void>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    Toasty.success(requireContext(),
+                            hinhThuc ? "Đã tạo phiếu mượn mang về thành công!" : "Đã tạo phiếu mượn tại chỗ thành công!",
+                            Toasty.LENGTH_LONG).show();
+                    requireActivity().onBackPressed();
+                } else {
+                    String errorMsg = response.body() != null ? response.body().getMessage() : "Lỗi không xác định";
+                    Toasty.error(requireContext(), "Lỗi tạo phiếu mượn: " + errorMsg, Toasty.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseModel<Void>> call, Throwable t) {
+                Toasty.error(requireContext(), "Lỗi kết nối: " + t.getMessage(), Toasty.LENGTH_LONG).show();
             }
         });
     }

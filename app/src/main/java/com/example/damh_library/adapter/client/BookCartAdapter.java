@@ -78,6 +78,15 @@ public class BookCartAdapter extends RecyclerView.Adapter<BookCartAdapter.CartVi
             holder.tvAvailableCount.setText("Hết sách");
         }
 
+        if(book.isBookStatus())
+        {
+            holder.tvStatus.setText("Tốt");
+        }
+        else
+        {
+            holder.tvStatus.setText("Hỏng");
+        }
+
         // Checkbox state
         holder.cbSelectBook.setChecked(selectedBooks.contains(book));
         holder.cbSelectBook.setEnabled(availableCount > 0);
@@ -173,7 +182,7 @@ public class BookCartAdapter extends RecyclerView.Adapter<BookCartAdapter.CartVi
         MaterialCardView cardBook;
         CheckBox cbSelectBook;
         ImageView ivBookCover;
-        TextView tvBookTitle, tvBookId, tvAuthor, tvPublisher, tvISBN, tvAvailableCount;
+        TextView tvBookTitle, tvBookId, tvAuthor, tvPublisher, tvISBN, tvAvailableCount, tvStatus;
         ImageButton btnRemove;
 
         public CartViewHolder(@NonNull View itemView) {
@@ -189,6 +198,7 @@ public class BookCartAdapter extends RecyclerView.Adapter<BookCartAdapter.CartVi
             tvISBN = itemView.findViewById(R.id.tvISBN);
             tvAvailableCount = itemView.findViewById(R.id.tvAvailableCount);
             btnRemove = itemView.findViewById(R.id.btnRemove);
+            tvStatus = itemView.findViewById(R.id.tvStatus);
         }
     }
 }

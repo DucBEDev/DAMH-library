@@ -47,6 +47,16 @@ public class SelectedBookCheckoutAdapter extends RecyclerView.Adapter<SelectedBo
             holder.tvAvailable.setTextColor(context.getColor(R.color.teal_700));
         }
 
+        if(book.isBookStatus())
+        {
+            holder.tvStatus.setText("Mới");
+        }
+        else
+        {
+            holder.tvStatus.setText("Cũ");
+        }
+
+
         // Load ảnh bìa
         if (book.getImageUrl() != null && !book.getImageUrl().isEmpty()) {
             Glide.with(context)
@@ -66,7 +76,7 @@ public class SelectedBookCheckoutAdapter extends RecyclerView.Adapter<SelectedBo
 
     static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView ivBookCover;
-        TextView tvBookTitle, tvBookAuthor, tvMaSach, tvAvailable;
+        TextView tvBookTitle, tvBookAuthor, tvMaSach, tvAvailable, tvStatus;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -75,6 +85,7 @@ public class SelectedBookCheckoutAdapter extends RecyclerView.Adapter<SelectedBo
             tvBookAuthor = itemView.findViewById(R.id.tvBookAuthor);
             tvMaSach = itemView.findViewById(R.id.tvMaSach);
             tvAvailable = itemView.findViewById(R.id.tvAvailable);
+            tvStatus = itemView.findViewById(R.id.tvStatus);
         }
     }
 }

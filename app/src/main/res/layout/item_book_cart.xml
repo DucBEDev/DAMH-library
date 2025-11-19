@@ -138,6 +138,37 @@
 
         </LinearLayout>
 
+        <!-- TÌNH TRẠNG - THÊM MỚI -->
+        <LinearLayout
+            android:id="@+id/llStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintTop_toBottomOf="@id/llBookInfo"
+            app:layout_constraintStart_toEndOf="@id/cardCover">
+
+            <View
+                android:id="@+id/viewStatusDot"
+                android:layout_width="8dp"
+                android:layout_height="8dp"
+                android:layout_marginEnd="6dp" />
+
+            <TextView
+                android:id="@+id/tvStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tốt"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
         <!-- Available Badge -->
         <LinearLayout
             android:id="@+id/llAvailableBadge"
@@ -152,7 +183,7 @@
             android:paddingTop="3dp"
             android:paddingBottom="3dp"
             android:gravity="center_vertical"
-            app:layout_constraintTop_toBottomOf="@id/llBookInfo"
+            app:layout_constraintTop_toBottomOf="@id/llStatus"
             app:layout_constraintStart_toEndOf="@id/cardCover">
 
             <ImageView

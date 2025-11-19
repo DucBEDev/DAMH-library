@@ -78,5 +78,17 @@
             app:layout_constraintBottom_toBottomOf="@id/ivBookCover"
             app:layout_constraintStart_toStartOf="@id/tvBookTitle" />
 
+        <!-- Tình trạng - THÊM MỚI -->
+        <TextView
+            android:id="@+id/tvStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Tình trạng: Tốt"
+            android:textSize="13sp"
+            android:textColor="#666666"
+            app:layout_constraintTop_toBottomOf="@id/tvAvailable"
+            app:layout_constraintStart_toStartOf="@id/tvBookTitle" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

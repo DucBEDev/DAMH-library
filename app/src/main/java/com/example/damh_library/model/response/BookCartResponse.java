@@ -32,12 +32,15 @@ public class BookCartResponse implements Parcelable {
     @SerializedName("addedDate")
     private String addedDate;
 
+    @SerializedName("bookStatus")
+    private boolean bookStatus;
+
     // Constructors
     public BookCartResponse() {
     }
 
     public BookCartResponse(String isbn, String maSach, String title, String author, String publisher,
-                            String imageUrl, Integer soLuongKhaDung, String addedDate) {
+                            String imageUrl, Integer soLuongKhaDung, String addedDate, boolean bookStatus) {
         this.isbn = normalizeIsbn(isbn);
         this.maSach = normalizeCode(maSach);
         this.title = title;
@@ -45,6 +48,7 @@ public class BookCartResponse implements Parcelable {
         this.publisher = publisher;
         this.imageUrl = imageUrl;
         this.soLuongKhaDung = soLuongKhaDung;
+        this.bookStatus = bookStatus;
         this.addedDate = addedDate;
     }
 
@@ -58,7 +62,7 @@ public class BookCartResponse implements Parcelable {
         return raw.trim();
     }
 
-    public BookCartResponse(String isbn, String maSach, String title, String author, String publisher, Integer soLuongKhaDung, String addedDate) {
+    public BookCartResponse(String isbn, String maSach, String title, String author, String publisher, Integer soLuongKhaDung, String addedDate, boolean bookStatus) {
         this.isbn = isbn;
         this.maSach = maSach;
         this.title = title;
@@ -66,6 +70,7 @@ public class BookCartResponse implements Parcelable {
         this.publisher = publisher;
         this.soLuongKhaDung = soLuongKhaDung;
         this.addedDate = addedDate;
+        this.bookStatus = bookStatus;
     }
 
     // Parcelable implementation
@@ -183,7 +188,15 @@ public class BookCartResponse implements Parcelable {
         this.addedDate = addedDate;
     }
 
-//    @Override
+    public boolean isBookStatus() {
+        return bookStatus;
+    }
+
+    public void setBookStatus(boolean bookStatus) {
+        this.bookStatus = bookStatus;
+    }
+
+    //    @Override
 //    public boolean equals(Object o) {
 //        if (this == o) return true;
 //        if (o == null || getClass() != o.getClass()) return false;
@@ -193,8 +206,8 @@ public class BookCartResponse implements Parcelable {
 //        return a != null && a.equals(b);
 //    }
 
-    @Override
-    public int hashCode() {
-        return isbn != null ? isbn.trim().hashCode() : 0;
-    }
+//    @Override
+//    public int hashCode() {
+//        return isbn != null ? isbn.trim().hashCode() : 0;
+//    }
 }
