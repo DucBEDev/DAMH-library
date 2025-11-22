@@ -1,6 +1,8 @@
 package com.example.damh_library.network.client;
 
+import com.example.damh_library.model.ResponseSingleModel;
 import com.example.damh_library.model.response.BookCartResponse;
+import com.example.damh_library.model.response.BookDetailResponse;
 import com.example.damh_library.model.response.MostBorrowBookResponse;
 import com.example.damh_library.model.ResponseModel;
 
@@ -18,4 +20,7 @@ public interface DauSachApiService {
 
     @GET("admin/dausach/favorites/{readerId}")
     Call<ResponseModel<BookCartResponse>> getFavoriteBooks(@Path("readerId") String readerId);
+
+    @GET("admin/dausach/detail/{isbn}")
+    Call<ResponseSingleModel<BookDetailResponse>> getBookDetail(@Path("isbn") String isbn);
 }

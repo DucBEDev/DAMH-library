@@ -1,5 +1,6 @@
 package com.example.damh_library.adapter.client;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -7,10 +8,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.damh_library.R;
+import com.example.damh_library.fragment.client.BookDetailFragment;
 import com.example.damh_library.model.response.MostBorrowBookResponse;
 import com.google.android.material.button.MaterialButton;
 
@@ -54,6 +57,20 @@ public class BookListAdapter extends RecyclerView.Adapter<BookListAdapter.BookVi
         } else {
             holder.ivBookCover.setImageResource(R.drawable.ic_book);
         }
+
+        // Chuyển đến BookDetailFragment khi click item
+        holder.itemView.setOnClickListener(v -> {
+            if (holder.itemView.getContext() instanceof AppCompatActivity) {
+                String isbn = mostBorrowBookResponse.getIsbn(); // Giả sử có getIsbn() trong model
+                Log.e("AAA", isbn);
+                BookDetailFragment fragment = BookDetailFragment.newInstance(isbn);
+                AppCompatActivity activity = (AppCompatActivity) holder.itemView.getContext();
+                activity.getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragmentClientDashboard, fragment) // Thay bằng container ID của bạn
+                        .addToBackStack(null)
+                        .commit();
+            }
+        });
 
 //        holder.btnBorrow.setOnClickListener(v -> {
 //            if (holder.itemView.getContext() instanceof AppCompatActivity) {

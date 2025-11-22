@@ -3,6 +3,8 @@ package com.example.damh_library.model.response;
 import com.google.gson.annotations.SerializedName;
 
 public class MostBorrowBookResponse {
+    @SerializedName("isbn")
+    private String isbn;
     @SerializedName("title")
     private String title;
 
@@ -40,6 +42,23 @@ public class MostBorrowBookResponse {
         this.borrowCount = borrowCount;
         this.quantity = 0;
         this.imagePath = imagePath;
+    }
+
+    public MostBorrowBookResponse(String isbn, String title, String author, int borrowCount, String imagePath) {
+        this.isbn = isbn;
+        this.title = title;
+        this.author = author;
+        this.borrowCount = borrowCount;
+        this.quantity = 0;
+        this.imagePath = imagePath;
+    }
+
+    public String getIsbn() {
+        return isbn;
+    }
+
+    public void setIsbn(String isbn) {
+        this.isbn = isbn;
     }
 
     public String getTitle() {
@@ -92,8 +111,9 @@ public class MostBorrowBookResponse {
 
     @Override
     public String toString() {
-        return "Book{" +
-                "title='" + title + '\'' +
+        return "MostBorrowBookResponse{" +
+                "isbn='" + isbn + '\'' +
+                ", title='" + title + '\'' +
                 ", author='" + author + '\'' +
                 ", borrowCount=" + borrowCount +
                 ", quantity=" + quantity +

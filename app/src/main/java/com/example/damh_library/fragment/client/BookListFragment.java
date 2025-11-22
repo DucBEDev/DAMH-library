@@ -3,6 +3,7 @@ package com.example.damh_library.fragment.client;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -119,6 +120,7 @@ public class BookListFragment extends Fragment {
                 progressBar.setVisibility(View.GONE);
                 if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
                     List<MostBorrowBookResponse> data = response.body().getData();
+                    Log.e("AAA", data.toString());
                     if (data == null) data = new ArrayList<>();
 
                     allBooks.clear();
