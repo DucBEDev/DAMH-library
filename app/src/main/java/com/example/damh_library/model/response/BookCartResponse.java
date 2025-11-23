@@ -27,6 +27,9 @@ public class BookCartResponse {
     @SerializedName("addedDate")
     private String addedDate;
 
+    // Transient UI-only field to track selection in cart (not serialized)
+    private transient boolean selected = false;
+
     // Constructors
     public BookCartResponse() {
     }
@@ -48,7 +51,7 @@ public class BookCartResponse {
     }
 
     public BookCartResponse(String isbn, String title, String author, String publisher, Integer soLuongKhaDung, String addedDate) {
-        this.isbn = isbn;
+        this.isbn = normalizeIsbn(isbn);
         this.title = title;
         this.author = author;
         this.publisher = publisher;
@@ -61,7 +64,7 @@ public class BookCartResponse {
     }
 
     public void setIsbn(String isbn) {
-        this.isbn = isbn;
+        this.isbn = normalizeIsbn(isbn);
     }
 
     public String getTitle() {
@@ -110,6 +113,35 @@ public class BookCartResponse {
 
     public void setAddedDate(String addedDate) {
         this.addedDate = addedDate;
+    }
+
+    // Selection helpers (UI only)
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
+    }
+
+    /**
+     * Utility: check if addedDate (ISO string) is older than given days from now.
+     * If addedDate is null or unparsable, returns false.
+     */
+    public boolean isAddedDateOlderThanDays(int days) {
+        if (addedDate == null || addedDate.isEmpty()) return false;
+        try {
+            // Expecting ISO 8601 like 2024-08-28T00:00:00.000Z
+            java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+            sdf.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));
+            java.util.Date ad = sdf.parse(addedDate);
+            if (ad == null) return false;
+            long diff = new java.util.Date().getTime() - ad.getTime();
+            long daysDiff = diff / (24L * 60L * 60L * 1000L);
+            return daysDiff > days;
+        } catch (Exception ex) {
+            return false;
+        }
     }
 
     @Override

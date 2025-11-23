@@ -130,10 +130,10 @@ public class ClientProfileFragment extends Fragment {
         tvPhone.setText(profile.getDienThoai());
         tvAddress.setText(profile.getDiaChiDG());
 
-        // Load avatar nếu có URL (hiện tại chưa có nhưng giữ chỗ)
-        if (profile.getAvatarUrl() != null && !profile.getAvatarUrl().isEmpty()) {
+        // Load avatar từ API
+        if (profile.getAvatar() != null && !profile.getAvatar().isEmpty()) {
             Glide.with(this)
-                    .load(profile.getAvatarUrl())
+                    .load(profile.getAvatar())
                     .fitCenter()
                     .placeholder(R.drawable.ic_user)
                     .error(R.drawable.ic_user)
