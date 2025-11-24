@@ -5,7 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -21,10 +21,15 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.damh_library.R;
 import com.example.damh_library.adapter.client.BookCartAdapter;
 import com.example.damh_library.model.ResponseModel;
+import com.example.damh_library.model.ResponseSingleModel;
 import com.example.damh_library.model.response.BookCartResponse;
+import com.example.damh_library.model.response.BorrowedBookResponse;
+import com.example.damh_library.model.response.ReaderCardResponse;
 import com.example.damh_library.network.ApiClient;
 import com.example.damh_library.network.client.DauSachApiService;
+import com.example.damh_library.network.client.ReaderApiService;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.checkbox.MaterialCheckBox;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.util.ArrayList;
@@ -40,13 +45,16 @@ public class BookCartFragment extends Fragment {
     private RecyclerView rvCartBooks;
     private LinearLayout llEmptyState, llSelectionHeader;
     private ImageButton btnBack;
-    private CheckBox cbSelectAll;
+    private MaterialCheckBox cbSelectAll;
     private TextView tvSelectedCount, tvTotalBooks;
     private MaterialButton btnCreateBorrowTicket;
     private BookCartAdapter adapter;
     private List<BookCartResponse> cartBooks;
     private ProgressBar progressLoading;
     private DauSachApiService dauSachApiService;
+    private ReaderApiService readerApiService;
+    private CompoundButton.OnCheckedChangeListener selectAllListener;
+
 
     @Nullable
     @Override
@@ -73,19 +81,13 @@ public class BookCartFragment extends Fragment {
 
         btnBack.setOnClickListener(v -> requireActivity().onBackPressed());
 
-        cbSelectAll.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (adapter != null) {
-                if (isChecked) {
-                    adapter.selectAll();
-                } else {
-                    adapter.deselectAll();
-                }
-            }
+        btnCreateBorrowTicket.setOnClickListener(v -> {
+            List<BookCartResponse> selectedBooks = adapter.getSelectedBooks();
+            checkConstraintsAndCreate(selectedBooks);
         });
 
-        btnCreateBorrowTicket.setOnClickListener(v -> showCreateBorrowTicketDialog());
-
         dauSachApiService = ApiClient.getClient().create(DauSachApiService.class);
+        readerApiService = ApiClient.getClient().create(ReaderApiService.class);
     }
 
     private void setupRecyclerView() {
@@ -110,6 +112,20 @@ public class BookCartFragment extends Fragment {
 
         rvCartBooks.setLayoutManager(new LinearLayoutManager(requireContext()));
         rvCartBooks.setAdapter(adapter);
+//        rvCartBooks.setHasFixedSize(false);
+//        rvCartBooks.setNestedScrollingEnabled(false);
+//        rvCartBooks.setDescendantFocusability(ViewGroup.FOCUS_AFTER_DESCENDANTS);
+
+
+        selectAllListener = (buttonView, isChecked) -> {
+            if (adapter == null) return;
+
+            if (isChecked) adapter.selectAll();
+            else adapter.deselectAll();
+        };
+
+        cbSelectAll.setOnCheckedChangeListener(selectAllListener);
+
     }
 
     private void loadCartBooks() {
@@ -128,10 +144,9 @@ public class BookCartFragment extends Fragment {
                         cartBooks.clear();
                         // body.getData() is List<BookCartResponse>
                         for (BookCartResponse b : body.getData()) {
-                            // Ensure fields from backend map correctly (trim ISBN, fallback image)
-                            if (b.getIsbn() == null || b.getIsbn().isEmpty()) {
-                                // try to read ISBN from other fields if necessary (not available here)
-                            }
+                            // Normalize ISBN and ensure imageUrl presence
+                            if (b.getIsbn() != null) b.setIsbn(b.getIsbn());
+                            if (b.getImageUrl() == null || b.getImageUrl().isEmpty()) b.setImageUrl(null);
                             cartBooks.add(b);
                         }
                         updateUI();
@@ -171,14 +186,99 @@ public class BookCartFragment extends Fragment {
         // dauSachApiService.removeFromCart(userId, book.getIsbn()).enqueue(callback);
 
         if (position >= 0 && position < cartBooks.size()) {
+            // remove from the shared list, then let adapter adjust its selection indices and notify
             cartBooks.remove(position);
-            adapter.notifyItemRemoved(position);
-            adapter.notifyItemRangeChanged(position, cartBooks.size());
+            adapter.onItemRemoved(position);
 
             Toasty.success(requireContext(), "Đã xóa \"" + book.getTitle() + "\" khỏi giỏ", Toast.LENGTH_SHORT).show();
 
             updateUI();
         }
+    }
+
+    private void checkConstraintsAndCreate(List<BookCartResponse> selectedBooks) {
+        if (selectedBooks.isEmpty()) {
+            Toasty.warning(requireContext(), "Vui lòng chọn sách để tạo phiếu mượn", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Max 3 check (also enforced in adapter)
+        if (selectedBooks.size() > 3) {
+            Toasty.warning(requireContext(), "Chỉ được mượn tối đa 3 cuốn" , Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String userId = requireContext().getSharedPreferences("app_prefs", Context.MODE_PRIVATE).getString("key_userId", "5");
+
+        // 1) Check reader card active
+        readerApiService.getCardInfo(userId).enqueue(new Callback<ResponseSingleModel<ReaderCardResponse>>() {
+            @Override
+            public void onResponse(Call<ResponseSingleModel<ReaderCardResponse>> call, Response<ResponseSingleModel<ReaderCardResponse>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    ReaderCardResponse card = response.body().getData();
+                    boolean cardActive = true;
+                    if (card != null && card.getNgayHetHan() != null) {
+                        // compare ngayHetHan with today
+                        try {
+                            java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+                            sdf.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));
+                            java.util.Date expire = sdf.parse(card.getNgayHetHan());
+                            if (expire != null && new java.util.Date().after(expire)) {
+                                cardActive = false;
+                            }
+                        } catch (Exception ex) {
+                            // if unparsable, assume inactive to be safe
+                            cardActive = false;
+                        }
+                    }
+
+                    if (!cardActive) {
+                        Toasty.error(requireContext(), "Thẻ độc giả không hoạt động (hết hạn)", Toast.LENGTH_LONG).show();
+                        return;
+                    }
+
+                    // 2) Check overdue borrowed books (API returns list)
+                    readerApiService.getBorrowedBooks(userId).enqueue(new Callback<ResponseModel<BorrowedBookResponse>>() {
+                        @Override
+                        public void onResponse(Call<ResponseModel<BorrowedBookResponse>> call, Response<ResponseModel<BorrowedBookResponse>> response) {
+                            boolean hasOverdue = false;
+                            if (response.isSuccessful() && response.body() != null && response.body().isSuccess() && response.body().getData() != null) {
+                                List<BorrowedBookResponse> borrowed = response.body().getData();
+                                for (BorrowedBookResponse b : borrowed) {
+                                    if (b == null) continue;
+                                    if (b.isPastDueDate() || b.isOverdueDays(15)) {
+                                        hasOverdue = true;
+                                        break;
+                                    }
+                                }
+                            }
+
+                            if (hasOverdue) {
+                                Toasty.error(requireContext(), "Bạn đang có sách mượn quá hạn, không thể mượn thêm", Toast.LENGTH_LONG).show();
+                                return;
+                            }
+
+                            // All constraints passed -> show confirmation and create
+                            showCreateBorrowTicketDialogConfirmed(selectedBooks);
+                        }
+
+                        @Override
+                        public void onFailure(Call<ResponseModel<BorrowedBookResponse>> call, Throwable t) {
+                            // If borrowed-book check fails (server unreachable), be conservative and block with message
+                            Toasty.error(requireContext(), "Không thể kiểm tra trạng thái mượn hiện tại. Vui lòng thử lại sau", Toast.LENGTH_LONG).show();
+                        }
+                    });
+
+                } else {
+                    Toasty.error(requireContext(), "Không thể kiểm tra thông tin thẻ độc giả", Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseSingleModel<ReaderCardResponse>> call, Throwable t) {
+                Toasty.error(requireContext(), "Không thể kiểm tra thông tin thẻ độc giả", Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     private void showCreateBorrowTicketDialog() {
@@ -189,6 +289,22 @@ public class BookCartFragment extends Fragment {
             return;
         }
 
+        StringBuilder message = new StringBuilder("Bạn đang tạo phiếu mượn cho:\n\n");
+        for (int i = 0; i < selectedBooks.size(); i++) {
+            message.append((i + 1)).append(". ").append(selectedBooks.get(i).getTitle()).append("\n");
+        }
+        message.append("\nTổng: ").append(selectedBooks.size()).append(" cuốn sách");
+
+        new MaterialAlertDialogBuilder(requireContext())
+                .setTitle("Xác nhận tạo phiếu mượn")
+                .setMessage(message.toString())
+                .setPositiveButton("Tạo phiếu", (dialog, which) -> createBorrowTicket(selectedBooks))
+                .setNegativeButton("Hủy", null)
+                .show();
+    }
+
+    private void showCreateBorrowTicketDialogConfirmed(List<BookCartResponse> selectedBooks) {
+        // Build message and confirm
         StringBuilder message = new StringBuilder("Bạn đang tạo phiếu mượn cho:\n\n");
         for (int i = 0; i < selectedBooks.size(); i++) {
             message.append((i + 1)).append(". ").append(selectedBooks.get(i).getTitle()).append("\n");
@@ -221,21 +337,29 @@ public class BookCartFragment extends Fragment {
     }
 
     private void updateSelectionUI(List<BookCartResponse> selectedBooks) {
-        int selectedCount = selectedBooks.size();
+        // Use adapter's counts to ensure consistency (avoid mismatch between fragment local counting and adapter state)
+        if (adapter == null) return;
+
+        int selectedCount = adapter.getSelectedCount();
+        int selectableCount = adapter.getSelectableCount();
+
         tvSelectedCount.setText("Đã chọn: " + selectedCount);
 
-        // Update select all checkbox
+        // Update select all checkbox (temporarily detach listener while programmatically changing checked state)
         cbSelectAll.setOnCheckedChangeListener(null);
-        cbSelectAll.setChecked(adapter.isAllSelected());
-        cbSelectAll.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (adapter != null) {
-                if (isChecked) {
-                    adapter.selectAll();
-                } else {
-                    adapter.deselectAll();
-                }
-            }
-        });
+
+        if (selectedCount == 0) {
+            cbSelectAll.setChecked(false);
+            cbSelectAll.setAlpha(1f);
+        } else if (selectedCount == selectableCount) {
+            cbSelectAll.setChecked(true);
+            cbSelectAll.setAlpha(1f);
+        } else {
+            cbSelectAll.setChecked(false);
+        }
+
+        cbSelectAll.setOnCheckedChangeListener(selectAllListener);
+
 
         // Enable/disable create button
         btnCreateBorrowTicket.setEnabled(selectedCount > 0);

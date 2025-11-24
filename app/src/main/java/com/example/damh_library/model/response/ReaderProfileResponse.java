@@ -8,7 +8,7 @@ public class ReaderProfileResponse {
     private String ngaySinh;     // Ngày sinh (ISO format)
     private String diaChiDG;     // Địa chỉ độc giả
     private String dienThoai;    // Số điện thoại
-    private String avatarUrl;    // URL ảnh đại diện (nếu có)
+    private String avatar;       // URL ảnh đại diện (nếu có)
 
     // Constructor đầy đủ
     public ReaderProfileResponse(String hoTenDG, String emailDG, String soCMND,
@@ -21,6 +21,18 @@ public class ReaderProfileResponse {
         this.ngaySinh = ngaySinh;
         this.diaChiDG = diaChiDG;
         this.dienThoai = dienThoai;
+    }
+
+    public ReaderProfileResponse(String hoTenDG, String emailDG, String soCMND, boolean gioiTinh,
+                                 String ngaySinh, String diaChiDG, String dienThoai, String avatar) {
+        this.hoTenDG = hoTenDG;
+        this.emailDG = emailDG;
+        this.soCMND = soCMND;
+        this.gioiTinh = gioiTinh;
+        this.ngaySinh = ngaySinh;
+        this.diaChiDG = diaChiDG;
+        this.dienThoai = dienThoai;
+        this.avatar = avatar;
     }
 
     // Constructor rỗng
@@ -56,8 +68,8 @@ public class ReaderProfileResponse {
         return dienThoai;
     }
 
-    public String getAvatarUrl() {
-        return avatarUrl;
+    public String getAvatar() {
+        return avatar;
     }
 
     // Setters
@@ -89,7 +101,7 @@ public class ReaderProfileResponse {
         this.dienThoai = dienThoai;
     }
 
-    public void setAvatarUrl(String avatarUrl) {
-        this.avatarUrl = avatarUrl;
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
     }
 }

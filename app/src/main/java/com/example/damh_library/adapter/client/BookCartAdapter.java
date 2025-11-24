@@ -1,13 +1,14 @@
 package com.example.damh_library.adapter.client;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -15,17 +16,19 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.android.material.card.MaterialCardView;
+import com.google.android.material.checkbox.MaterialCheckBox;
 import com.example.damh_library.R;
 import com.example.damh_library.model.response.BookCartResponse;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import es.dmoral.toasty.Toasty;
+
 public class BookCartAdapter extends RecyclerView.Adapter<BookCartAdapter.CartViewHolder> {
 
     private Context context;
     private List<BookCartResponse> cartBooks;
-    private List<BookCartResponse> selectedBooks;
     private OnCartItemListener listener;
 
     public interface OnCartItemListener {
@@ -37,8 +40,21 @@ public class BookCartAdapter extends RecyclerView.Adapter<BookCartAdapter.CartVi
     public BookCartAdapter(Context context, List<BookCartResponse> cartBooks, OnCartItemListener listener) {
         this.context = context;
         this.cartBooks = cartBooks;
-        this.selectedBooks = new ArrayList<>();
         this.listener = listener;
+    }
+
+    private String normIsbn(String isbn) {
+        if (isbn == null) return null;
+        return isbn.trim();
+    }
+
+    private boolean isBookSelected(BookCartResponse book) {
+        return book != null && book.isSelected();
+    }
+
+    private void setBookSelected(BookCartResponse book, boolean selected) {
+        if (book == null) return;
+        book.setSelected(selected);
     }
 
     @NonNull
@@ -66,16 +82,21 @@ public class BookCartAdapter extends RecyclerView.Adapter<BookCartAdapter.CartVi
         holder.tvPublisher.setText(book.getPublisher() != null ? book.getPublisher() : "Chưa rõ NXB");
         holder.tvISBN.setText("ISBN: " + (book.getIsbn() != null ? book.getIsbn() : "N/A"));
 
-        // Available count
-        int availableCount = book.getSoLuongKhaDung() != null ? book.getSoLuongKhaDung() : 0;
-        holder.tvAvailableCount.setText("Còn " + availableCount + " cuốn");
+        Integer rawAvailable = book.getSoLuongKhaDung();
+        boolean knownAvailability = rawAvailable != null;
+        int availableCount = knownAvailability ? rawAvailable : 0; // used only for numeric display
 
-        // Update available badge color
-        if (availableCount > 0) {
-            holder.tvAvailableCount.setTextColor(context.getColor(R.color.success));
+        if (knownAvailability) {
+            holder.tvAvailableCount.setText("Còn " + availableCount + " cuốn");
+            if (availableCount > 0) {
+                holder.tvAvailableCount.setTextColor(context.getColor(R.color.success));
+            } else {
+                holder.tvAvailableCount.setTextColor(context.getColor(R.color.error));
+                holder.tvAvailableCount.setText("Hết sách");
+            }
         } else {
-            holder.tvAvailableCount.setTextColor(context.getColor(R.color.error));
-            holder.tvAvailableCount.setText("Hết sách");
+            holder.tvAvailableCount.setText("Còn: -");
+            holder.tvAvailableCount.setTextColor(context.getColor(R.color.text_secondary));
         }
 
         if(book.isBookStatus())
@@ -88,8 +109,10 @@ public class BookCartAdapter extends RecyclerView.Adapter<BookCartAdapter.CartVi
         }
 
         // Checkbox state
-        holder.cbSelectBook.setChecked(selectedBooks.contains(book));
-        holder.cbSelectBook.setEnabled(availableCount > 0);
+        holder.cbSelectBook.setOnCheckedChangeListener(null);
+        holder.cbSelectBook.setChecked(isBookSelected(book));
+        boolean selectable = knownAvailability ? (availableCount > 0) : true;
+        holder.cbSelectBook.setEnabled(selectable);
 
         // Load book cover image
         if (book.getImageUrl() != null && !book.getImageUrl().isEmpty()) {
@@ -103,24 +126,31 @@ public class BookCartAdapter extends RecyclerView.Adapter<BookCartAdapter.CartVi
             holder.ivBookCover.setImageResource(R.drawable.ic_book_placeholder);
         }
 
-        // Checkbox change listener
-        holder.cbSelectBook.setOnCheckedChangeListener((buttonView, isChecked) -> {
+        // Checkbox change listener - respond to checked state changes and guard max-3
+        final android.widget.CompoundButton.OnCheckedChangeListener[] cbRef = new android.widget.CompoundButton.OnCheckedChangeListener[1];
+        cbRef[0] = (buttonView, isChecked) -> {
+            int selectedCount = getSelectedCount();
             if (isChecked) {
-                if (!selectedBooks.contains(book)) {
-                    selectedBooks.add(book);
+                if (selectedCount >= 3) {
+                    holder.cbSelectBook.setOnCheckedChangeListener(null);
+                    holder.cbSelectBook.setChecked(false);
+                    holder.cbSelectBook.setOnCheckedChangeListener(cbRef[0]);
+                    Toasty.warning(context, "Bạn chỉ được chọn tối đa 3 cuốn để mượn", Toast.LENGTH_SHORT).show();
+                    return;
                 }
+                setBookSelected(book, true);
             } else {
-                selectedBooks.remove(book);
+                setBookSelected(book, false);
             }
-            if (listener != null) {
-                listener.onSelectionChanged(selectedBooks);
-            }
-        });
+            if (listener != null) listener.onSelectionChanged(buildSelectedListFromPositions());
+        };
+
+        holder.cbSelectBook.setOnCheckedChangeListener(cbRef[0]);
 
         // Click on card to toggle selection
         holder.cardBook.setOnClickListener(v -> {
-            if (availableCount > 0) {
-                holder.cbSelectBook.setChecked(!holder.cbSelectBook.isChecked());
+            if (selectable) {
+                holder.cbSelectBook.performClick();
             }
             if (listener != null) listener.onBookClick(book);
         });
@@ -140,56 +170,94 @@ public class BookCartAdapter extends RecyclerView.Adapter<BookCartAdapter.CartVi
 
     // Public methods for selection management
     public void selectAll() {
-        selectedBooks.clear();
+        for (BookCartResponse book : cartBooks) setBookSelected(book, false);
+        // select first up to 3 selectable books
+        int added = 0;
         for (BookCartResponse book : cartBooks) {
-            if (book.getSoLuongKhaDung() != null && book.getSoLuongKhaDung() > 0) {
-                selectedBooks.add(book);
+            boolean allow = (book.getSoLuongKhaDung() == null) || (book.getSoLuongKhaDung() > 0);
+            if (allow && added < 3) {
+                setBookSelected(book, true);
+                added++;
             }
         }
         notifyDataSetChanged();
         if (listener != null) {
-            listener.onSelectionChanged(selectedBooks);
+            listener.onSelectionChanged(buildSelectedListFromPositions());
         }
     }
 
     public void deselectAll() {
-        selectedBooks.clear();
+        for (BookCartResponse b : cartBooks) if (b != null) b.setSelected(false);
         notifyDataSetChanged();
         if (listener != null) {
-            listener.onSelectionChanged(selectedBooks);
+            listener.onSelectionChanged(new ArrayList<>());
         }
     }
 
     public List<BookCartResponse> getSelectedBooks() {
-        return new ArrayList<>(selectedBooks);
+        return buildSelectedListFromPositions();
     }
 
     public int getSelectedCount() {
-        return selectedBooks.size();
+        // Return number of items currently marked selected (matches visible checked boxes)
+        return buildSelectedListFromPositions().size();
+    }
+
+    // Count how many items are actually selectable (same logic used for enabling selection)
+    public int getSelectableCount() {
+        int selectableCount = 0;
+
+        for (int i = 0; i < cartBooks.size(); i++) {
+            BookCartResponse book = cartBooks.get(i);
+            if (book == null) {
+                continue;
+            }
+
+            Integer qty = book.getSoLuongKhaDung();
+            boolean allow = (qty == null) || (qty > 0);
+            if (allow) selectableCount++;
+        }
+        return selectableCount;
     }
 
     public boolean isAllSelected() {
-        int availableCount = 0;
-        for (BookCartResponse book : cartBooks) {
-            if (book.getSoLuongKhaDung() != null && book.getSoLuongKhaDung() > 0) {
-                availableCount++;
-            }
-        }
-        return availableCount > 0 && selectedBooks.size() == availableCount;
+        int selectableCount = getSelectableCount();
+        if (selectableCount == 0) return false;
+        return getSelectedCount() == selectableCount;
     }
 
-    static class CartViewHolder extends RecyclerView.ViewHolder {
-        MaterialCardView cardBook;
-        CheckBox cbSelectBook;
-        ImageView ivBookCover;
-        TextView tvBookTitle, tvBookId, tvAuthor, tvPublisher, tvISBN, tvAvailableCount, tvStatus;
-        ImageButton btnRemove;
+    // Call when an item is removed from the adapter's data at index removedIndex
+    public void onItemRemoved(int removedIndex) {
+        if (removedIndex < 0) return;
+        notifyDataSetChanged();
+        if (listener != null) listener.onSelectionChanged(buildSelectedListFromPositions());
+    }
+
+    // Build selected BookCartResponse list from positions
+    private List<BookCartResponse> buildSelectedListFromPositions() {
+        List<BookCartResponse> out = new ArrayList<>();
+        for (BookCartResponse b : cartBooks) {
+            if (b == null) continue;
+            if (b.isSelected()) out.add(b);
+        }
+
+        if (!out.isEmpty()) {
+            StringBuilder sb = new StringBuilder();
+            for (BookCartResponse b : out) sb.append(b.getTitle()).append(" | ");
+        }
+        return out;
+    }
+
+    public class CartViewHolder extends RecyclerView.ViewHolder {
+        private MaterialCardView cardBook;
+        private ImageView ivBookCover;
+        private TextView tvBookTitle, tvAuthor, tvPublisher, tvISBN, tvAvailableCount, tvBookId, tvStatus;
+        private MaterialCheckBox cbSelectBook;
+        private ImageButton btnRemove;
 
         public CartViewHolder(@NonNull View itemView) {
             super(itemView);
-
             cardBook = itemView.findViewById(R.id.cardBook);
-            cbSelectBook = itemView.findViewById(R.id.cbSelectBook);
             ivBookCover = itemView.findViewById(R.id.ivBookCover);
             tvBookTitle = itemView.findViewById(R.id.tvBookTitle);
             tvBookId = itemView.findViewById(R.id.tvBookId);
@@ -197,6 +265,7 @@ public class BookCartAdapter extends RecyclerView.Adapter<BookCartAdapter.CartVi
             tvPublisher = itemView.findViewById(R.id.tvPublisher);
             tvISBN = itemView.findViewById(R.id.tvISBN);
             tvAvailableCount = itemView.findViewById(R.id.tvAvailableCount);
+            cbSelectBook = itemView.findViewById(R.id.cbSelectBook);
             btnRemove = itemView.findViewById(R.id.btnRemove);
             tvStatus = itemView.findViewById(R.id.tvStatus);
         }
