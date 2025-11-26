@@ -1,13 +1,16 @@
 package com.example.damh_library.network.client;
 
 import com.example.damh_library.model.ResponseSingleModel;
+import com.example.damh_library.model.request.BookCartRequest;
 import com.example.damh_library.model.response.BookCartResponse;
 import com.example.damh_library.model.response.BookDetailResponse;
 import com.example.damh_library.model.response.MostBorrowBookResponse;
 import com.example.damh_library.model.ResponseModel;
 
 import retrofit2.Call;
+import retrofit2.http.Body;
 import retrofit2.http.GET;
+import retrofit2.http.POST;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 
@@ -23,4 +26,7 @@ public interface DauSachApiService {
 
     @GET("admin/dausach/detail/{isbn}")
     Call<ResponseSingleModel<BookDetailResponse>> getBookDetail(@Path("isbn") String isbn);
+
+    @POST("admin/dausach/addToCart")
+    Call<ResponseModel<Void>> addBookToCart(@Body BookCartRequest request);
 }

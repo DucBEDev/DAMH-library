@@ -17,13 +17,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.damh_library.R;
 import com.example.damh_library.adapter.client.SelectedBookCheckoutAdapter;
 import com.example.damh_library.model.ResponseModel;
-import com.example.damh_library.model.ResponseSingleModel;
 import com.example.damh_library.model.request.PhieuMuonRequest;
 import com.example.damh_library.model.response.BookCartResponse;
-import com.example.damh_library.model.response.ReaderProfileResponse;
 import com.example.damh_library.network.ApiClient;
 import com.example.damh_library.network.client.CheckoutSlipApiService;
-import com.example.damh_library.network.client.ReaderApiService;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.button.MaterialButtonToggleGroup;
 
