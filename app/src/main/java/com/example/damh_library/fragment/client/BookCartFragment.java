@@ -2,6 +2,7 @@ package com.example.damh_library.fragment.client;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -144,9 +145,14 @@ public class BookCartFragment extends Fragment {
                         cartBooks.clear();
                         // body.getData() is List<BookCartResponse>
                         for (BookCartResponse b : body.getData()) {
-                            // Normalize ISBN and ensure imageUrl presence
-                            if (b.getIsbn() != null) b.setIsbn(b.getIsbn());
-                            if (b.getImageUrl() == null || b.getImageUrl().isEmpty()) b.setImageUrl(null);
+                            // Normalize ISBN
+                            if (b.getIsbn() != null) {
+                                b.setIsbn(b.getIsbn().trim());
+                            }
+                            
+                            // Xử lý image URL - không cần set vì getImageUrl() sẽ tự động ưu tiên hinhAnhPath
+                            Log.d("BookCart", "Book: " + b.getTitle() + ", Image: " + b.getImageUrl());
+                            
                             cartBooks.add(b);
                         }
                         updateUI();

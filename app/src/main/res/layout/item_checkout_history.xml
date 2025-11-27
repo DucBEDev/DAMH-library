@@ -4,60 +4,209 @@
     android:id="@+id/cardItem"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="8dp"
-    android:layout_marginTop="4dp"
-    android:layout_marginStart="2dp"
-    android:layout_marginEnd="2dp"
+    android:layout_marginBottom="12dp"
     android:clickable="true"
+    android:focusable="true"
     android:foreground="?attr/selectableItemBackground"
-    android:padding="12dp"
-    app:cardElevation="4dp"
-    app:cardCornerRadius="8dp">
+    app:cardElevation="3dp"
+    app:cardCornerRadius="12dp"
+    app:cardBackgroundColor="@android:color/white">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="vertical">
 
-        <ImageView
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:src="@drawable/ic_receipt"
-            android:contentDescription="icon_receipt"
-            android:layout_gravity="center_vertical" />
-
-        <LinearLayout
-            android:layout_width="0dp"
+        <!-- Main Content -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:layout_weight="1"
-            android:orientation="vertical">
+            android:padding="16dp">
 
-            <TextView
-                android:id="@+id/tvSlipId"
+            <!-- Icon Background -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardIcon"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="#E3F2FD"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent">
+
+                <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:src="@drawable/ic_receipt"
+                    android:layout_gravity="center"
+                    android:contentDescription="icon_receipt"
+                    app:tint="#1976D2" />
+
+            </androidx.cardview.widget.CardView>
+
+            <!-- Content -->
+            <LinearLayout
+                android:id="@+id/layoutContent"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="8dp"
+                android:orientation="vertical"
+                app:layout_constraintTop_toTopOf="@id/cardIcon"
+                app:layout_constraintBottom_toBottomOf="@id/cardIcon"
+                app:layout_constraintStart_toEndOf="@id/cardIcon"
+                app:layout_constraintEnd_toStartOf="@id/layoutStatus">
+
+                <TextView
+                    android:id="@+id/tvSlipId"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Mã phiếu: 1001"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:textColor="#212121" />
+
+                <TextView
+                    android:id="@+id/tvForm"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="Hình thức: Mang về"
+                    android:textSize="14sp"
+                    android:textColor="#757575" />
+
+            </LinearLayout>
+
+            <!-- Status Badge -->
+            <LinearLayout
+                android:id="@+id/layoutStatus"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Mã phiếu: 1001"
+                android:orientation="vertical"
+                android:gravity="end"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:src="@drawable/ic_calendar"
+                        android:contentDescription="calendar_icon"
+                        app:tint="#999999" />
+
+                    <TextView
+                        android:id="@+id/tvDate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
+                        android:text="27/11/2025"
+                        android:textSize="13sp"
+                        android:textColor="#999999" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- Divider -->
+            <View
+                android:id="@+id/divider"
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_marginTop="12dp"
+                android:background="#E0E0E0"
+                app:layout_constraintTop_toBottomOf="@id/cardIcon"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+            <!-- Bottom Info - Expandable -->
+            <LinearLayout
+                android:id="@+id/layoutBookInfo"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?attr/selectableItemBackground"
+                app:layout_constraintTop_toBottomOf="@id/divider"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <ImageView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:src="@drawable/ic_book"
+                    android:contentDescription="book_icon"
+                    app:tint="#FF9800" />
+
+                <TextView
+                    android:id="@+id/tvBookCount"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="6dp"
+                    android:text="3 cuốn sách"
+                    android:textSize="13sp"
+                    android:textColor="#616161" />
+
+                <ImageView
+                    android:id="@+id/btnExpandCollapse"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_arrow_down"
+                    android:padding="2dp"
+                    android:contentDescription="expand_collapse"
+                    app:tint="#1976D2" />
+
+            </LinearLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- Expandable Book List -->
+        <LinearLayout
+            android:id="@+id/layoutExpandable"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:background="#F8F9FA"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp">
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#E0E0E0"
+                android:layout_marginBottom="8dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Danh sách sách:"
                 android:textStyle="bold"
-                android:textColor="@android:color/black" />
+                android:textSize="13sp"
+                android:textColor="#424242"
+                android:layout_marginStart="16dp"
+                android:layout_marginBottom="8dp"/>
 
-            <TextView
-                android:id="@+id/tvForm"
-                android:layout_width="wrap_content"
+            <!-- RecyclerView for books -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvBookList"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Hình thức: Mang về"
-                android:textColor="@android:color/darker_gray"
-                android:layout_marginTop="2dp" />
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:nestedScrollingEnabled="false"/>
 
         </LinearLayout>
-
-        <TextView
-            android:id="@+id/tvDate"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="2025-11-10"
-            android:textColor="@android:color/darker_gray"
-            android:layout_gravity="center_vertical" />
 
     </LinearLayout>
 

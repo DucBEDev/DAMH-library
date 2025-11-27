@@ -154,7 +154,7 @@ public class CreateCheckoutFragment extends Fragment {
 
         PhieuMuonRequest request = new PhieuMuonRequest( maDG, hinhThuc, maNV, selectedBooks);
         CheckoutSlipApiService service = ApiClient.getClient().create(CheckoutSlipApiService.class);
-        Call<ResponseModel<Void>> call = service.createCheckout(request);
+        Call<ResponseModel<Void>> call = service.createCheckoutWithRequest(request);
         call.enqueue(new Callback<ResponseModel<Void>>() {
             @Override
             public void onResponse(Call<ResponseModel<Void>> call, Response<ResponseModel<Void>> response) {

@@ -28,17 +28,25 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-            <!-- Profile Image -->
-            <com.google.android.material.imageview.ShapeableImageView
-                android:id="@+id/imgProfile"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:scaleType="centerCrop"
-                android:src="@drawable/ic_account"
-                android:padding="3dp"
-                app:shapeAppearanceOverlay="@style/CircleImageView"
-                app:strokeColor="@android:color/white"
-                app:strokeWidth="3dp" />
+            <!-- Profile Image với khung tròn đẹp hơn -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="104dp"
+                android:layout_height="104dp"
+                app:cardCornerRadius="52dp"
+                app:cardElevation="8dp"
+                app:strokeWidth="4dp"
+                app:strokeColor="@android:color/white">
+
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/imgProfile"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/ic_account"
+                    android:background="#E0E0E0"
+                    app:shapeAppearanceOverlay="@style/CircleImageView" />
+
+            </com.google.android.material.card.MaterialCardView>
 
             <!-- User Name -->
             <TextView

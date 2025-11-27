@@ -37,6 +37,8 @@ public class BookCartResponse implements Parcelable {
     // Transient UI-only field to track selection in cart (not serialized)
     private transient boolean selected = false;
 
+    private String hinhAnhPath;
+
     // Constructors
     public BookCartResponse() {
     }
@@ -88,6 +90,7 @@ public class BookCartResponse implements Parcelable {
             soLuongKhaDung = in.readInt();
         }
         addedDate = in.readString();
+        hinhAnhPath = in.readString();
     }
 
     public static final Creator<BookCartResponse> CREATOR = new Creator<BookCartResponse>() {
@@ -122,6 +125,7 @@ public class BookCartResponse implements Parcelable {
             dest.writeInt(soLuongKhaDung);
         }
         dest.writeString(addedDate);
+        dest.writeString(hinhAnhPath);
     }
 
     // Getter và Setter (giữ nguyên như code cũ của bạn)
@@ -166,6 +170,10 @@ public class BookCartResponse implements Parcelable {
     }
 
     public String getImageUrl() {
+        // Nếu có hinhAnhPath từ API thì dùng, không thì dùng imageUrl cũ
+        if (hinhAnhPath != null && !hinhAnhPath.trim().isEmpty()) {
+            return hinhAnhPath.trim();
+        }
         return imageUrl;
     }
 
@@ -195,6 +203,14 @@ public class BookCartResponse implements Parcelable {
 
     public void setBookStatus(boolean bookStatus) {
             this.bookStatus = bookStatus;
+    }
+
+    public String getHinhAnhPath() {
+        return hinhAnhPath;
+    }
+
+    public void setHinhAnhPath(String hinhAnhPath) {
+        this.hinhAnhPath = hinhAnhPath;
     }
 
     // Selection helpers (UI only)

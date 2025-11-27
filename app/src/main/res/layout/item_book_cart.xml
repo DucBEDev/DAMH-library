@@ -160,6 +160,7 @@
             android:paddingBottom="4dp"
             android:layout_marginStart="12dp"
             android:layout_marginTop="8dp"
+            android:background="@drawable/bg_status_container"
             app:layout_constraintTop_toBottomOf="@id/llBookInfo"
             app:layout_constraintStart_toEndOf="@id/cardCover">
 
@@ -167,7 +168,8 @@
                 android:id="@+id/viewStatusDot"
                 android:layout_width="8dp"
                 android:layout_height="8dp"
-                android:layout_marginEnd="6dp" />
+                android:layout_marginEnd="6dp"
+                android:background="@drawable/bg_status_good" />
 
             <TextView
                 android:id="@+id/tvStatus"
@@ -175,7 +177,8 @@
                 android:layout_height="wrap_content"
                 android:text="Tốt"
                 android:textSize="11sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:textColor="@color/success" />
         </LinearLayout>
 
         <!-- Available Badge -->
