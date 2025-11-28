@@ -81,16 +81,22 @@ public class BookCartAdapter extends RecyclerView.Adapter<BookCartAdapter.CartVi
         // Set book information
         holder.tvBookTitle.setText(book.getTitle() != null ? book.getTitle() : "Không có tên");
 
-        // Book ID (mã sách) - adjust getter if your model uses different name
-        String maSach = null;
-        try {
-            maSach = book.getMaSach();
-        } catch (Exception ignored) { }
+        // Book ID (mã sách)
+        String maSach = book.getMaSach();
+        if (maSach != null) {
+            maSach = maSach.trim(); // Remove extra spaces
+        }
         holder.tvBookId.setText("Mã: " + (maSach != null ? maSach : "N/A"));
 
         holder.tvAuthor.setText(book.getAuthor() != null ? book.getAuthor() : "Chưa rõ tác giả");
         holder.tvPublisher.setText(book.getPublisher() != null ? book.getPublisher() : "Chưa rõ NXB");
-        holder.tvISBN.setText("ISBN: " + (book.getIsbn() != null ? book.getIsbn() : "N/A"));
+        
+        // Xử lý ISBN
+        String isbn = book.getIsbn();
+        if (isbn != null) {
+            isbn = isbn.trim();
+        }
+        holder.tvISBN.setText("ISBN: " + (isbn != null ? isbn : "N/A"));
 
         Integer rawAvailable = book.getSoLuongKhaDung();
         boolean knownAvailability = rawAvailable != null;
@@ -109,13 +115,20 @@ public class BookCartAdapter extends RecyclerView.Adapter<BookCartAdapter.CartVi
             holder.tvAvailableCount.setTextColor(context.getColor(R.color.text_secondary));
         }
 
-        if(book.isBookStatus())
-        {
+        // Trạng thái sách - sử dụng bookStatus từ API
+        if (book.isBookStatus()) {
             holder.tvStatus.setText("Tốt");
-        }
-        else
-        {
+            holder.tvStatus.setTextColor(context.getColor(R.color.success));
+            // Đổi màu dot indicator nếu có
+            if (holder.viewStatusDot != null) {
+                holder.viewStatusDot.setBackgroundResource(R.drawable.bg_status_good);
+            }
+        } else {
             holder.tvStatus.setText("Hỏng");
+            holder.tvStatus.setTextColor(context.getColor(R.color.error));
+            if (holder.viewStatusDot != null) {
+                holder.viewStatusDot.setBackgroundResource(R.drawable.bg_status_damaged);
+            }
         }
 
         // Checkbox state
@@ -124,10 +137,13 @@ public class BookCartAdapter extends RecyclerView.Adapter<BookCartAdapter.CartVi
         boolean selectable = knownAvailability ? (availableCount > 0) : true;
         holder.cbSelectBook.setEnabled(selectable);
 
-        // Load book cover image
-        if (book.getImageUrl() != null && !book.getImageUrl().isEmpty()) {
+        // Load book cover image - sử dụng getImageUrl() sẽ tự động ưu tiên hinhAnhPath
+        String imageUrl = book.getImageUrl();
+        Log.d("BookCartAdapter", "Loading image for: " + book.getTitle() + ", URL: " + imageUrl);
+        
+        if (imageUrl != null && !imageUrl.isEmpty()) {
             Glide.with(context)
-                    .load(book.getImageUrl())
+                    .load(imageUrl)
                     .placeholder(R.drawable.ic_book_placeholder)
                     .error(R.drawable.ic_book_placeholder)
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
@@ -272,6 +288,8 @@ public class BookCartAdapter extends RecyclerView.Adapter<BookCartAdapter.CartVi
         private MaterialCheckBox cbSelectBook;
         private ImageButton btnRemove;
         private LinearLayout llStatus, llAvailableBadge;
+        private View viewStatusDot; // Thêm view cho dot indicator trạng thái
+
 
         public CartViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -288,6 +306,8 @@ public class BookCartAdapter extends RecyclerView.Adapter<BookCartAdapter.CartVi
             tvStatus = itemView.findViewById(R.id.tvStatus);
             llAvailableBadge = itemView.findViewById(R.id.llAvailableBadge);
             llStatus = itemView.findViewById(R.id.llStatus);
+            viewStatusDot = itemView.findViewById(R.id.viewStatusDot); // Ánh xạ view cho dot indicator
+
         }
     }
 }

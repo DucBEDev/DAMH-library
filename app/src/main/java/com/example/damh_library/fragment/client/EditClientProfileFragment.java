@@ -533,36 +533,36 @@ public class EditClientProfileFragment extends Fragment {
              // Gọi API với @Path userId thay vì @Query
             ReaderApiService service = ApiClient.getClient().create(ReaderApiService.class);
             Call<ResponseSingleModel<ReaderProfileResponse>> call = service.updateProfile(
-                userId, hoTenDGBody, emailDGBody, soCMNDBody, gioiTinhBody,
+                userId, hoTenDGBody, emailDGBody, soCMNDBody, gioiTinhBody, 
                 ngaySinhBody, diaChiDGBody, dienThoaiBody, currentImagePathBody, hasNewImageBody, avatarPart
             );
             
             call.enqueue(new Callback<ResponseSingleModel<ReaderProfileResponse>>() {
                 @Override
-                public void onResponse(Call<ResponseSingleModel<ReaderProfileResponse>> call,
+                public void onResponse(Call<ResponseSingleModel<ReaderProfileResponse>> call, 
                                      Response<ResponseSingleModel<ReaderProfileResponse>> response) {
                     Log.d("EditProfile", "API Response code: " + response.code());
-
+                    
                     if (response.isSuccessful() && response.body() != null) {
-                        Log.d("EditProfile", "Response successful");
-
                         if (response.body().isSuccess()) {
                             ReaderProfileResponse updated = response.body().getData();
 
-                            // Cập nhật SharedPreferences
-                            String newName = (updated != null && updated.getHoTenDG() != null) ?
+                            // Cập nhật SharedPreferences với thông tin mới
+                            String newName = (updated != null && updated.getHoTenDG() != null) ? 
                                            updated.getHoTenDG() : fullName;
-                            String newEmail = (updated != null && updated.getEmailDG() != null) ?
+                            String newEmail = (updated != null && updated.getEmailDG() != null) ? 
                                             updated.getEmailDG() : email;
-
+                            
                             prefs.edit()
                                     .putString("key_username", newName)
                                     .putString("key_userEmail", newEmail)
                                     .apply();
 
-                            String successMsg = (response.body().getMessage() != null) ?
+                            String successMsg = (response.body().getMessage() != null) ? 
                                               response.body().getMessage() : "Cập nhật thành công";
                             Toasty.success(requireContext(), successMsg, Toast.LENGTH_SHORT).show();
+                            
+                            // Quay lại và refresh data
                             requireActivity().onBackPressed();
                         } else {
                             String errMsg = (response.body().getMessage() != null) ?

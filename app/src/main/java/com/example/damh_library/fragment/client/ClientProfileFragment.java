@@ -130,16 +130,18 @@ public class ClientProfileFragment extends Fragment {
         tvPhone.setText(profile.getDienThoai());
         tvAddress.setText(profile.getDiaChiDG());
 
-        // Load avatar từ API
+        // Load avatar từ API với centerCrop để hiển thị tốt hơn
         if (profile.getAvatar() != null && !profile.getAvatar().isEmpty()) {
             Glide.with(this)
                     .load(profile.getAvatar())
-                    .fitCenter()
+                    .centerCrop()
                     .placeholder(R.drawable.ic_user)
                     .error(R.drawable.ic_user)
                     .into(ivAvatar);
+            Log.d("ClientProfile", "Avatar loaded from URL: " + profile.getAvatar());
         } else {
             ivAvatar.setImageResource(R.drawable.ic_user);
+            Log.d("ClientProfile", "Using default avatar");
         }
     }
 

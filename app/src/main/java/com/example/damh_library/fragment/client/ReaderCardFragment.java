@@ -15,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.damh_library.R;
 import com.example.damh_library.model.ResponseSingleModel;
 import com.example.damh_library.model.response.ReaderCardResponse;
@@ -128,6 +129,21 @@ public class ReaderCardFragment extends Fragment {
         String expiryDisplay = formatIsoToDisplay(expiryIso);
         tvIssueDate.setText(issueDisplay);
         tvExpiryDate.setText(expiryDisplay);
+
+        // Load avatar từ API response
+        String avatarUrl = card.getAvatar();
+        if (avatarUrl != null && !avatarUrl.isEmpty()) {
+            Glide.with(this)
+                    .load(avatarUrl)
+                    .centerCrop()
+                    .placeholder(R.drawable.ic_user)
+                    .error(R.drawable.ic_user)
+                    .into(ivReaderAvatar);
+            Log.d("ReaderCard", "Avatar loaded from URL: " + avatarUrl);
+        } else {
+            ivReaderAvatar.setImageResource(R.drawable.ic_user);
+            Log.d("ReaderCard", "Using default avatar");
+        }
 
         // compute days remaining
         long days = computeDaysRemaining(expiryIso);

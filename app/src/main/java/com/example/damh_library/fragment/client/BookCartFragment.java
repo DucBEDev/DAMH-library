@@ -1,6 +1,7 @@
 package com.example.damh_library.fragment.client;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -55,6 +56,7 @@ public class BookCartFragment extends Fragment {
 
         public ViewPagerAdapter(@NonNull Fragment fragment) {
             super(fragment);
+
         }
 
         void addFragment(Fragment fragment, String title) {

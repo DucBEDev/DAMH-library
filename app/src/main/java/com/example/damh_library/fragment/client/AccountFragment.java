@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,11 +16,19 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.bumptech.glide.Glide;
 import com.example.damh_library.R;
+import com.example.damh_library.activity.MainActivity;
+import com.example.damh_library.model.ResponseSingleModel;
+import com.example.damh_library.model.response.ReaderProfileResponse;
+import com.example.damh_library.network.ApiClient;
+import com.example.damh_library.network.client.ReaderApiService;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.imageview.ShapeableImageView;
 
-import com.example.damh_library.activity.MainActivity;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class AccountFragment extends Fragment {
 
@@ -60,6 +69,13 @@ public class AccountFragment extends Fragment {
 
         // Logout button
         btnLogout = view.findViewById(R.id.btnLogout);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Reload user data when fragment resumes to get updated avatar
+        loadUserDataFromApi();
     }
 
     private void setupListeners() {
@@ -127,24 +143,82 @@ public class AccountFragment extends Fragment {
     }
 
     private void loadUserData() {
-        // Load user data from SharedPreferences
+        // Load từ API thay vì chỉ SharedPreferences
+        loadUserDataFromApi();
+    }
+
+    private void loadUserDataFromApi() {
+        // Load basic data từ SharedPreferences trước
         SharedPreferences prefs = requireContext().getSharedPreferences("app_prefs", Context.MODE_PRIVATE);
         String username = prefs.getString("key_username", "");
+        String email = prefs.getString("key_userEmail", "");
+        String userId = prefs.getString("key_userId", "2");
 
+        // Hiển thị data cơ bản trước
         if (username != null && !username.isEmpty()) {
             tvUserName.setText(username);
         } else {
             tvUserName.setText(getString(R.string.default_username));
         }
 
-        // If you have user email stored, read it; otherwise keep existing placeholder or empty
-        String email = prefs.getString("key_userEmail", "");
         if (email != null && !email.isEmpty()) {
             tvUserEmail.setText(email);
         }
 
-        // TODO: Load profile image using Glide or Picasso if available
-        // Glide.with(this).load(userImageUrl).into(imgProfile);
+        // Gọi API để lấy avatar và thông tin mới nhất
+        ReaderApiService service = ApiClient.getClient().create(ReaderApiService.class);
+        Call<ResponseSingleModel<ReaderProfileResponse>> call = service.getProfileInfo(userId);
+
+        call.enqueue(new Callback<ResponseSingleModel<ReaderProfileResponse>>() {
+            @Override
+            public void onResponse(Call<ResponseSingleModel<ReaderProfileResponse>> call, Response<ResponseSingleModel<ReaderProfileResponse>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
+                    ReaderProfileResponse profile = response.body().getData();
+
+                    // Cập nhật thông tin mới nhất
+                    String fullName = profile.getHoTenDG();
+                    String emailProfile = profile.getEmailDG();
+                    String avatarUrl = profile.getAvatar();
+
+                    if (fullName != null && !fullName.isEmpty()) {
+                        tvUserName.setText(fullName);
+                        // Cập nhật lại SharedPreferences
+                        prefs.edit().putString("key_username", fullName).apply();
+                    }
+
+                    if (emailProfile != null && !emailProfile.isEmpty()) {
+                        tvUserEmail.setText(emailProfile);
+                        // Cập nhật lại SharedPreferences
+                        prefs.edit().putString("key_userEmail", emailProfile).apply();
+                    }
+
+                    // Load avatar từ Cloudinary URL
+                    if (avatarUrl != null && !avatarUrl.isEmpty()) {
+                        Glide.with(AccountFragment.this)
+                                .load(avatarUrl)
+                                .centerCrop()
+                                .placeholder(R.drawable.ic_account)
+                                .error(R.drawable.ic_account)
+                                .into(imgProfile);
+                        Log.d("AccountFragment", "Avatar loaded from URL: " + avatarUrl);
+                    } else {
+                        imgProfile.setImageResource(R.drawable.ic_account);
+                        Log.d("AccountFragment", "Using default avatar");
+                    }
+                } else {
+                    Log.e("AccountFragment", "Failed to load profile: " + response.code());
+                    // Sử dụng avatar mặc định nếu API thất bại
+                    imgProfile.setImageResource(R.drawable.ic_account);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseSingleModel<ReaderProfileResponse>> call, Throwable t) {
+                Log.e("AccountFragment", "API call failed: " + (t != null ? t.getMessage() : "Unknown error"));
+                // Sử dụng avatar mặc định nếu mạng lỗi
+                imgProfile.setImageResource(R.drawable.ic_account);
+            }
+        });
     }
 
     private void showLogoutDialog() {

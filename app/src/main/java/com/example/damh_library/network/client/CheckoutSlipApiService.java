@@ -1,14 +1,8 @@
 package com.example.damh_library.network.client;
 
 import com.example.damh_library.model.ResponseModel;
-import com.example.damh_library.model.ResponseSingleModel;
-import com.example.damh_library.model.request.BookCartRequest;
 import com.example.damh_library.model.request.PhieuMuonRequest;
-import com.example.damh_library.model.request.UpdateClientProfileRequest;
-import com.example.damh_library.model.response.BookCartResponse;
 import com.example.damh_library.model.response.CheckoutHistoryResponse;
-import com.example.damh_library.model.response.ReaderProfileResponse;
-import com.example.damh_library.model.response.TypeBorrowResponse;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -21,7 +15,19 @@ public interface CheckoutSlipApiService {
     @GET("admin/phieumuon/{readerId}")
     Call<ResponseModel<CheckoutHistoryResponse>> getReaderCheckoutHistory(@Path("readerId") String readerId);
 
+    @GET("admin/phieumuon/{readerId}")
+    Call<ResponseModel<CheckoutHistoryResponse>> searchCheckoutHistory(
+        @Path("readerId") String readerId,
+        @Query("maPhieu") String maPhieu
+    );
+
     @POST("admin/phieumuon/create")
-    Call<ResponseModel<Void>> createCheckout(@Body PhieuMuonRequest request);
+    Call<ResponseModel<Void>> createCheckoutWithRequest(@Body PhieuMuonRequest request);
+
+    @POST("admin/phieumuon/{readerId}")
+    Call<ResponseModel<CheckoutHistoryResponse>> createCheckout(
+        @Path("readerId") String readerId,
+        @Query("maPhieu") String maPhieu
+    );
 }
 
