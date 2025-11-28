@@ -97,16 +97,24 @@ public class SubBookAdapter extends RecyclerView.Adapter<SubBookAdapter.ViewHold
 //            holder.llBorrowStatus.setBackgroundTintList(ContextCompat.getColorStateList(context, R.color.success));
 
             holder.btnAddToCart.setVisibility(View.VISIBLE);
+            if(copy.getMaSach().contains("-ON"))
+            {
+                holder.btnAddToCart.setText("Muượn trực tuyến");
+            }
+            else
+            {
+                holder.btnAddToCart.setText("Thêm");
+            }
         }
 
         // Nút thêm vào giỏ
         holder.btnAddToCart.setOnClickListener(v -> {
-            AddBookToCartService(copy.getMaSach().trim());
+            AddBookToCartService(context, copy.getMaSach().trim());
         });
 
     }
 
-    private void AddBookToCartService(String maSach) {
+    public static void AddBookToCartService(Context context, String maSach) {
         SharedPreferences prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE);
         long maDG = Long.parseLong(prefs.getString("key_userId", "0"));
 

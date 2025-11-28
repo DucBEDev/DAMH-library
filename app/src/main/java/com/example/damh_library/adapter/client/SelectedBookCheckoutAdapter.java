@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.damh_library.R;
+import com.example.damh_library.fragment.client.SubCartFragment;
 import com.example.damh_library.model.response.BookCartResponse;
 import java.util.List;
 
@@ -17,11 +18,19 @@ public class SelectedBookCheckoutAdapter extends RecyclerView.Adapter<SelectedBo
 
     private Context context;
     private List<BookCartResponse> books;
+    private String cartType;
 
-    public SelectedBookCheckoutAdapter(Context context, List<BookCartResponse> books) {
+//    public SelectedBookCheckoutAdapter(Context context, List<BookCartResponse> books) {
+//        this.context = context;
+//        this.books = books;
+//    }
+
+    public SelectedBookCheckoutAdapter(Context context,String cartType, List<BookCartResponse> books) {
         this.context = context;
         this.books = books;
+        this.cartType=cartType;
     }
+
 
     @NonNull
     @Override
@@ -66,6 +75,13 @@ public class SelectedBookCheckoutAdapter extends RecyclerView.Adapter<SelectedBo
                     .into(holder.ivBookCover);
         } else {
             holder.ivBookCover.setImageResource(R.drawable.ic_book_placeholder);
+        }
+
+        if(cartType!=null && cartType.equalsIgnoreCase(SubCartFragment.TYPE_ONLINE))
+        {
+            holder.tvMaSach.setVisibility(View.GONE);
+            holder.tvAvailable.setVisibility(View.GONE);
+            holder.tvStatus.setVisibility(View.GONE);
         }
     }
 

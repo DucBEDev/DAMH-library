@@ -9,7 +9,9 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -24,6 +26,8 @@ public class ViewBookFragment extends Fragment {
 
     private WebView webView;
     private ProgressBar progressBar;
+    private ImageButton btnBack;
+    private TextView tvBookTitle;
 
     public static ViewBookFragment newInstance(String pdfUrl, String bookTitle) {
         ViewBookFragment fragment = new ViewBookFragment();
@@ -42,13 +46,15 @@ public class ViewBookFragment extends Fragment {
 
         webView = view.findViewById(R.id.webView);
         progressBar = view.findViewById(R.id.progressBar);
+        tvBookTitle = view.findViewById(R.id.tvBookTitle);
+        btnBack = view.findViewById(R.id.btnBack);
 
         String pdfUrl = getArguments() != null ? getArguments().getString(ARG_PDF_URL) : null;
         String bookTitle = getArguments() != null ? getArguments().getString(ARG_BOOK_TITLE, "Đọc sách") : "Đọc sách";
 
-        if (getActivity() != null) {
-            getActivity().setTitle(bookTitle);
-        }
+        tvBookTitle.setText(bookTitle);
+
+        btnBack.setOnClickListener(v -> requireActivity().onBackPressed());
 
         if (pdfUrl != null && !pdfUrl.isEmpty()) {
             loadPdfWithGoogleDocs(pdfUrl);

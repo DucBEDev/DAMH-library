@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -15,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.example.damh_library.fragment.client.SubCartFragment;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.checkbox.MaterialCheckBox;
 import com.example.damh_library.R;
@@ -30,6 +32,7 @@ public class BookCartAdapter extends RecyclerView.Adapter<BookCartAdapter.CartVi
     private Context context;
     private List<BookCartResponse> cartBooks;
     private OnCartItemListener listener;
+    private String cartType; // "physical" hoặc "online"
 
     public interface OnCartItemListener {
         void onBookClick(BookCartResponse book);
@@ -37,10 +40,17 @@ public class BookCartAdapter extends RecyclerView.Adapter<BookCartAdapter.CartVi
         void onSelectionChanged(List<BookCartResponse> selectedBooks);
     }
 
-    public BookCartAdapter(Context context, List<BookCartResponse> cartBooks, OnCartItemListener listener) {
+//    public BookCartAdapter(Context context, List<BookCartResponse> cartBooks, OnCartItemListener listener) {
+//        this.context = context;
+//        this.cartBooks = cartBooks;
+//        this.listener = listener;
+//    }
+
+    public BookCartAdapter(Context context, List<BookCartResponse> cartBooks, String cartType, OnCartItemListener listener) {
         this.context = context;
         this.cartBooks = cartBooks;
         this.listener = listener;
+        this.cartType = cartType;
     }
 
     private String normIsbn(String isbn) {
@@ -161,6 +171,13 @@ public class BookCartAdapter extends RecyclerView.Adapter<BookCartAdapter.CartVi
                 listener.onRemoveFromCart(book, holder.getAdapterPosition());
             }
         });
+
+        if(SubCartFragment.TYPE_ONLINE.equalsIgnoreCase(cartType))
+        {
+            holder.tvBookId.setVisibility(View.GONE);
+            holder.llAvailableBadge.setVisibility(View.GONE);
+            holder.llStatus.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -254,6 +271,7 @@ public class BookCartAdapter extends RecyclerView.Adapter<BookCartAdapter.CartVi
         private TextView tvBookTitle, tvAuthor, tvPublisher, tvISBN, tvAvailableCount, tvBookId, tvStatus;
         private MaterialCheckBox cbSelectBook;
         private ImageButton btnRemove;
+        private LinearLayout llStatus, llAvailableBadge;
 
         public CartViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -268,6 +286,8 @@ public class BookCartAdapter extends RecyclerView.Adapter<BookCartAdapter.CartVi
             cbSelectBook = itemView.findViewById(R.id.cbSelectBook);
             btnRemove = itemView.findViewById(R.id.btnRemove);
             tvStatus = itemView.findViewById(R.id.tvStatus);
+            llAvailableBadge = itemView.findViewById(R.id.llAvailableBadge);
+            llStatus = itemView.findViewById(R.id.llStatus);
         }
     }
 }

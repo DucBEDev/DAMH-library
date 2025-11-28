@@ -13,7 +13,7 @@ public class PhieuMuonRequest {
     public long maDG;
 
     @SerializedName("hinhThuc")
-    public boolean hinhThuc;
+    public Boolean hinhThuc;
 
     @SerializedName("maNV")
     public long maNV;
@@ -21,7 +21,7 @@ public class PhieuMuonRequest {
     @SerializedName("danhSachSach")
     public List<BookCartResponse> danhSachSach;
 
-    public PhieuMuonRequest(long maDG, boolean hinhThuc, long maNV, List<BookCartResponse> danhSachSach) {
+    public PhieuMuonRequest(long maDG, Boolean hinhThuc, long maNV, List<BookCartResponse> danhSachSach) {
 //        this.maPhieu = maPhieu;
         this.maDG = maDG;
         this.hinhThuc = hinhThuc;

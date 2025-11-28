@@ -190,23 +190,26 @@
                         android:id="@+id/toggleGroupBorrowType"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
                         app:singleSelection="true"
                         app:selectionRequired="true"
-                        app:checkedButton="@id/btnInPlace">
+                        app:checkedButton="@id/btnInPlace">   <!-- bạn có thể thay đổi default nếu muốn -->
 
+                        <!-- Nút 1: Mượn tại chỗ -->
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btnInPlace"
                             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                             android:layout_width="0dp"
                             android:layout_height="56dp"
                             android:layout_weight="1"
-                            android:text="Mượn tại chỗ"
-                            android:textSize="15sp"
+                            android:text="Tại chỗ"
+                            android:textSize="12sp"
                             android:textStyle="bold"
                             app:cornerRadius="12dp"
                             app:strokeWidth="2dp"
                             app:strokeColor="?attr/colorPrimary" />
 
+                        <!-- Nút 2: Mang về -->
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btnTakeHome"
                             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
@@ -214,7 +217,21 @@
                             android:layout_height="56dp"
                             android:layout_weight="1"
                             android:text="Mang về"
-                            android:textSize="15sp"
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            app:cornerRadius="12dp"
+                            app:strokeWidth="2dp"
+                            app:strokeColor="?attr/colorPrimary" />
+
+                        <!-- Nút 3: Mượn trực tuyến (mới thêm) -->
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnOnlineBorrow"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            android:layout_width="0dp"
+                            android:layout_height="56dp"
+                            android:layout_weight="1"
+                            android:text="Trực tuyến"
+                            android:textSize="12sp"
                             android:textStyle="bold"
                             app:cornerRadius="12dp"
                             app:strokeWidth="2dp"

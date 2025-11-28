@@ -101,6 +101,24 @@
 
         </LinearLayout>
 
+        <!-- NÚT MƯỢN TRỰC TUYẾN - NỔI BẬT NHẤT -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnReadOnline"
+            style="@style/Widget.MaterialComponents.Button"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="16dp"
+            android:text="Đọc sách"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/white"
+            app:icon="@drawable/ic_book"
+            app:iconGravity="textStart"
+            app:iconPadding="12dp"
+            app:cornerRadius="12dp"
+            android:elevation="6dp"
+            app:backgroundTint="@color/teal_700" />
+
         <!-- Mô tả sách -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
@@ -129,6 +147,15 @@
                     android:layout_height="1dp"
                     android:background="#E0E0E0"
                     android:layout_marginVertical="8dp" />
+
+                <TextView
+                    android:id="@+id/tvIsbn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="ISBN: "
+                    android:textSize="14sp"
+                    android:textColor="#666666"
+                    android:layout_marginBottom="4dp" />
 
                 <TextView
                     android:id="@+id/tvPublishDate"

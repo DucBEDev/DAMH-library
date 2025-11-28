@@ -43,15 +43,23 @@ public class CreateCheckoutFragment extends Fragment {
     private MaterialButtonToggleGroup toggleGroupBorrowType;
     private MaterialButton btnInPlace;
     private MaterialButton btnTakeHome;
+    private MaterialButton btnOnlineBorrow;
     private MaterialButton btnConfirmBorrow;
     private MaterialButton btnCancel;
     private TextView tvReaderName, tvReaderId, tvDate, tvTotalBooks;
     private RecyclerView rvSlipDetails;
 
+    private String cartType;
+
     public CreateCheckoutFragment() {}
 
-    public CreateCheckoutFragment(List<BookCartResponse> selectedBooks) {
+//    public CreateCheckoutFragment(List<BookCartResponse> selectedBooks) {
+//        this.selectedBooks = selectedBooks;
+//    }
+
+    public CreateCheckoutFragment(List<BookCartResponse> selectedBooks, String cartType) {
         this.selectedBooks = selectedBooks;
+        this.cartType=cartType;
     }
 
     @Override
@@ -64,6 +72,7 @@ public class CreateCheckoutFragment extends Fragment {
         toggleGroupBorrowType = view.findViewById(R.id.toggleGroupBorrowType);
         btnInPlace = view.findViewById(R.id.btnInPlace);
         btnTakeHome = view.findViewById(R.id.btnTakeHome);
+        btnOnlineBorrow = view.findViewById(R.id.btnOnlineBorrow);
         btnConfirmBorrow = view.findViewById(R.id.btnConfirmBorrow);
         btnCancel = view.findViewById(R.id.btnCancel);
 
@@ -85,16 +94,24 @@ public class CreateCheckoutFragment extends Fragment {
         btnCancel.setOnClickListener(v -> requireActivity().onBackPressed());
 
         btnConfirmBorrow.setOnClickListener(v -> {
-            boolean isTakeHome = (toggleGroupBorrowType.getCheckedButtonId() == R.id.btnTakeHome);
 
-            if (isTakeHome && selectedBooks.size() > 3) {
+            Boolean hinhThuc= null;
+            if(toggleGroupBorrowType.getCheckedButtonId() == R.id.btnTakeHome)
+            {
+                hinhThuc = true;
+            }
+            else if(toggleGroupBorrowType.getCheckedButtonId() == R.id.btnInPlace)
+            {
+                hinhThuc = false;
+            }
+            if (hinhThuc!=null && hinhThuc==true && selectedBooks.size() > 3) {
                 Toasty.error(requireContext(),
                         "Không thể mượn mang về quá 3 cuốn!", Toasty.LENGTH_LONG).show();
                 return;
             }
 
             // TODO: Gọi API tạo phiếu mượn ở đây
-            callCreatePhieuMuonApi(isTakeHome);
+            callCreatePhieuMuonApi(hinhThuc);
         });
 
         return view;
@@ -116,24 +133,34 @@ public class CreateCheckoutFragment extends Fragment {
     private void setupBookList() {
         tvTotalBooks.setText(selectedBooks.size() + " cuốn");
 
-        adapter = new SelectedBookCheckoutAdapter(requireContext(), selectedBooks);
+        adapter = new SelectedBookCheckoutAdapter(requireContext(),cartType ,selectedBooks);
         rvSlipDetails.setLayoutManager(new LinearLayoutManager(requireContext()));
         rvSlipDetails.setAdapter(adapter);
     }
 
     private void setupBorrowTypeLogic() {
-        boolean canTakeHome = selectedBooks.size() <= 3;
+        if (cartType!=null && cartType.equalsIgnoreCase(SubCartFragment.TYPE_ONLINE))
+        {
+            btnInPlace.setEnabled(false);
+            btnTakeHome.setEnabled(false);
+            toggleGroupBorrowType.check(R.id.btnOnlineBorrow);
+        }
 
-        // Mặc định chọn "Mượn tại chỗ"
-        toggleGroupBorrowType.check(R.id.btnInPlace);
+        else
+        {
+            boolean canTakeHome = selectedBooks.size() <= 3;
 
-        // Nếu chọn >3 sách → disable hoàn toàn nút "Mang về"
-        btnTakeHome.setEnabled(canTakeHome);
+            // Mặc định chọn "Mượn tại chỗ"
+            toggleGroupBorrowType.check(R.id.btnInPlace);
 
-        if (!canTakeHome) {
-            Toasty.info(requireContext(),
-                    "Bạn đã chọn " + selectedBooks.size() + " cuốn. Chỉ được mang về tối đa 3 cuốn.",
-                    Toasty.LENGTH_LONG).show();
+            // Nếu chọn >3 sách → disable hoàn toàn nút "Mang về"
+            btnTakeHome.setEnabled(canTakeHome);
+
+            if (!canTakeHome) {
+                Toasty.info(requireContext(),
+                        "Bạn đã chọn " + selectedBooks.size() + " cuốn. Chỉ được mang về tối đa 3 cuốn.",
+                        Toasty.LENGTH_LONG).show();
+            }
         }
 
         toggleGroupBorrowType.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
@@ -147,7 +174,7 @@ public class CreateCheckoutFragment extends Fragment {
         });
     }
 
-    private void callCreatePhieuMuonApi(boolean hinhThuc) {
+    private void callCreatePhieuMuonApi(Boolean hinhThuc) {
         SharedPreferences prefs = requireContext().getSharedPreferences("app_prefs", Context.MODE_PRIVATE);
         long maDG = Long.parseLong(prefs.getString("key_userId", "0")); // Lấy maDG
         long maNV = 4; // Giả định maNV (thủ thư)

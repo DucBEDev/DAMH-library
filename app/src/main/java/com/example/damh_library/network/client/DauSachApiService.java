@@ -29,4 +29,8 @@ public interface DauSachApiService {
 
     @POST("admin/dausach/addToCart")
     Call<ResponseModel<Void>> addBookToCart(@Body BookCartRequest request);
+    @GET("admin/dausach/isEbookStillBorrowed/{maDG}/{maSach}")
+    Call<ResponseSingleModel<Boolean>> isEbookStillBorrowed(@Path("maDG") long maDG, @Path("maSach") String maSach);
+    @GET("admin/dausach/getBookUrl/{isbn}")
+    Call<ResponseSingleModel<String>> getBookUrl(@Path("isbn") String isbn);
 }

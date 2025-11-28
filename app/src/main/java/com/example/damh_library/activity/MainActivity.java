@@ -120,6 +120,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private boolean validateInputs() {
+        edtUserName.setText("docgia5");
+        edtPassword.setText("123456789");
+
         boolean isValid = true;
 
         String userName = edtUserName.getText().toString().trim();
@@ -147,6 +150,8 @@ public class MainActivity extends AppCompatActivity {
     private void performLogin() {
         String userName = edtUserName.getText().toString().trim();
         String password = edtPassword.getText().toString().trim();
+
+
 
         if (isCustomerMode) {
             loginAction(userName, password, "reader");
