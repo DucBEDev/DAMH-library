@@ -4,14 +4,14 @@ import java.util.List;
 
 public class CheckoutHistoryResponse {
     private String maPhieu;
-    private boolean hinhThuc;
+    private Boolean hinhThuc;
     private String ngayMuon;
     private int soLuongSach;
     private List<BookInCheckoutResponse> danhSachSach;
 
     public CheckoutHistoryResponse() {}
 
-    public CheckoutHistoryResponse(String maPhieu, boolean hinhThuc, String ngayMuon, int soLuongSach, List<BookInCheckoutResponse> danhSachSach) {
+    public CheckoutHistoryResponse(String maPhieu, Boolean hinhThuc, String ngayMuon, int soLuongSach, List<BookInCheckoutResponse> danhSachSach) {
         this.maPhieu = maPhieu;
         this.hinhThuc = hinhThuc;
         this.ngayMuon = ngayMuon;
@@ -28,11 +28,11 @@ public class CheckoutHistoryResponse {
         this.maPhieu = maPhieu;
     }
 
-    public boolean isHinhThuc() {
+    public Boolean isHinhThuc() {
         return hinhThuc;
     }
 
-    public void setHinhThuc(boolean hinhThuc) {
+    public void setHinhThuc(Boolean hinhThuc) {
         this.hinhThuc = hinhThuc;
     }
 

@@ -63,7 +63,19 @@ public class CheckoutHistoryAdapter extends RecyclerView.Adapter<CheckoutHistory
         holder.tvSlipId.setText("Mã phiếu: " + item.getMaPhieu());
         
         // Hiển thị hình thức mượn
-        holder.tvForm.setText("Hình thức: " + (item.isHinhThuc() ? "Mang về" : "Tại chỗ"));
+        if(item.isHinhThuc()==null)
+        {
+            holder.tvForm.setText("Hình thức: Trực tuyến");
+        }
+        else if (item.isHinhThuc()==true)
+        {
+            holder.tvForm.setText("Hình thức: Mang về");
+        }
+        else if (item.isHinhThuc()==false)
+        {
+            holder.tvForm.setText("Hình thức: Tại chỗ");
+        }
+//        holder.tvForm.setText("Hình thức: " + (item.isHinhThuc() ? "Mang về" : "Tại chỗ"));
         
         // Format và hiển thị ngày mượn
         String formattedDate = formatDate(item.getNgayMuon());
