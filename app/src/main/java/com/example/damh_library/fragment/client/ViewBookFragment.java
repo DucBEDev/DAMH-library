@@ -16,18 +16,27 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.damh_library.R;
+import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ViewBookFragment extends Fragment {
 
     private static final String ARG_PDF_URL = "pdf_url";
     private static final String ARG_BOOK_TITLE = "book_title";
 
-    private WebView webView;
-    private ProgressBar progressBar;
     private ImageButton btnBack;
     private TextView tvBookTitle;
+
+    private TabLayout tabLayout;
+    private ViewPager2 viewPager;
+
 
     public static ViewBookFragment newInstance(String pdfUrl, String bookTitle) {
         ViewBookFragment fragment = new ViewBookFragment();
@@ -44,8 +53,9 @@ public class ViewBookFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_view_book, container, false);
 
-        webView = view.findViewById(R.id.webView);
-        progressBar = view.findViewById(R.id.progressBar);
+        tabLayout = view.findViewById(R.id.tabLayout);
+        viewPager = view.findViewById(R.id.viewPager);
+
         tvBookTitle = view.findViewById(R.id.tvBookTitle);
         btnBack = view.findViewById(R.id.btnBack);
 
@@ -56,49 +66,52 @@ public class ViewBookFragment extends Fragment {
 
         btnBack.setOnClickListener(v -> requireActivity().onBackPressed());
 
-        if (pdfUrl != null && !pdfUrl.isEmpty()) {
-            loadPdfWithGoogleDocs(pdfUrl);
-        } else {
-            webView.loadData("<h3 style='text-align:center;margin-top:50px'>Không tìm thấy file PDF</h3>", "text/html", "UTF-8");
-        }
+        setupViewPager();
 
         return view;
     }
 
-    @SuppressLint("SetJavaScriptEnabled")
-    private void loadPdfWithGoogleDocs(String pdfUrl) {
-        progressBar.setVisibility(View.VISIBLE);
+    private void setupViewPager() {
+        String pdf = "https://drive.google.com/file/d/1Tj-Jo1OEdWGp9f4GBKiZtUWRc4T80RGo/view";
+        ViewBookFragment.ViewPagerAdapter adapter = new ViewBookFragment.ViewPagerAdapter(this);
+        adapter.addFragment(BookContentFragment.newInstance(pdf), "Nội dung sách");
+        adapter.addFragment(PdfReaderFragment.newInstance(), "Trợ lý đọc sách");
 
-        WebSettings webSettings = webView.getSettings();
-        webSettings.setJavaScriptEnabled(true);
-        webSettings.setSupportZoom(true);
-        webSettings.setBuiltInZoomControls(true);
-        webSettings.setDisplayZoomControls(false);
-
-        webView.setWebViewClient(new WebViewClient() {
-            @Override
-            public void onPageFinished(WebView view, String url) {
-                progressBar.setVisibility(View.GONE);
-            }
-        });
-
-        // CÁCH TỐT NHẤT: Dùng chính xác link embed bạn có
-        String finalUrl = pdfUrl;  // đã là link embed rồi
-
-        // Hoặc nếu bạn có link share ngắn (1drv.ms), thêm ?embed=1
-        if (pdfUrl.contains("1drv.ms")) {
-            finalUrl = pdfUrl + "?embed=1";
-        }
-
-        webView.loadUrl(finalUrl);
+        viewPager.setAdapter(adapter);
+        new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> {
+            tab.setText(adapter.getPageTitle(position));
+        }).attach();
     }
 
-    @Override
-    public void onDestroyView() {
-        if (webView != null) {
-            webView.stopLoading();
-            webView.destroy();
+
+    static class ViewPagerAdapter extends FragmentStateAdapter {
+        private final List<Fragment> fragments = new ArrayList<>();
+        private final List<String> titles = new ArrayList<>();
+
+        public ViewPagerAdapter(@NonNull Fragment fragment) {
+            super(fragment);
+
         }
-        super.onDestroyView();
+
+        void addFragment(Fragment fragment, String title) {
+            fragments.add(fragment);
+            titles.add(title);
+        }
+
+        @NonNull @Override
+        public Fragment createFragment(int position) {
+            return fragments.get(position);
+        }
+
+        @Override
+        public int getItemCount() {
+            return fragments.size();
+        }
+
+        CharSequence getPageTitle(int position) {
+            return titles.get(position);
+        }
     }
+
+
 }

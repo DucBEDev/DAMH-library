@@ -281,6 +281,7 @@ public class BookDetailFragment extends Fragment {
 
     private void openEbookReader(String bookUrl)
     {
+        String pdf = "https://drive.google.com/file/d/1Tj-Jo1OEdWGp9f4GBKiZtUWRc4T80RGo/view";
         String bookTitle = "Charlotte & Willbur";
         ViewBookFragment fragment = ViewBookFragment.newInstance(bookUrl, bookTitle);
         requireActivity().getSupportFragmentManager()
