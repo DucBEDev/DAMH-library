@@ -14,6 +14,12 @@
         android:enabled="true" />
 
     <item
+        android:id="@+id/nav_assistant"
+        android:icon="@drawable/ic_book"
+        android:title="Trợ lý"
+        android:enabled="true" />
+
+    <item
         android:id="@+id/nav_borrowed"
         android:icon="@drawable/ic_book"
         android:title="Đã mượn"
