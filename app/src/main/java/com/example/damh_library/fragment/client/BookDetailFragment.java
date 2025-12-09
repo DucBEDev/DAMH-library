@@ -1,7 +1,5 @@
 package com.example.damh_library.fragment.client;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -23,12 +21,9 @@ import com.bumptech.glide.Glide;
 import com.example.damh_library.R;
 import com.example.damh_library.adapter.client.SubBookAdapter;
 import com.example.damh_library.model.ResponseSingleModel;
-import com.example.damh_library.model.request.BookCartRequest;
 import com.example.damh_library.model.response.BookDetailResponse;
 import com.example.damh_library.network.ApiClient;
 import com.example.damh_library.network.client.DauSachApiService;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
@@ -52,7 +47,7 @@ public class BookDetailFragment extends Fragment {
     private TextView tvBookCopiesCount;
     private RecyclerView rvBookCopies;
     private LinearLayout layoutEmptyBookCopies;
-    private ExtendedFloatingActionButton fabBorrowBook;
+    private com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton fabBorrowBook;
 
     private DauSachApiService apiService;
     private String isbn;
@@ -204,13 +199,17 @@ public class BookDetailFragment extends Fragment {
         // Book copies list
         setupBookCopiesList(bookDetail.getBookCopies());
 
-        // FAB click listener
+        // FAB click listener - chỉ chuyển qua PDF viewer
         fabBorrowBook.setOnClickListener(v -> {
-            if (available > 0) {
-                showBorrowOptionsDialog(bookDetail.getIsbn());
-            } else {
-                Toasty.warning(requireContext(), "Sách hiện tại đã hết", Toasty.LENGTH_SHORT).show();
-            }
+            String pdfUrl = "https://1drv.ms/b/c/dbe75c2bffdbeb63/IQRyXUbjL_a9S4M3e6s7CL-dAfamICfMDSjSmExWdgibUFk";
+            String bookTitle = bookDetail.getTitle() != null ? bookDetail.getTitle() : "Sách PDF";
+            ViewBookFragment fragment = ViewBookFragment.newInstance(pdfUrl, bookTitle);
+            
+            requireActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragmentClientDashboard, fragment)
+                    .addToBackStack(null)
+                    .commit();
         });
 
         // Set toolbar title
@@ -250,118 +249,5 @@ public class BookDetailFragment extends Fragment {
             Log.w("BookDetail", "Error parsing date: " + isoDate);
         }
         return "Không rõ";
-    }
-
-    private void showBorrowOptionsDialog(String isbn) {
-        new MaterialAlertDialogBuilder(requireContext())
-                .setTitle("Chọn hình thức mượn")
-                .setItems(new String[]{"Sách vật lý", "Sách điện tử"}, (dialog, which) -> {
-                    if (which == 0) {
-                        // Mượn sách vật lý - mở danh sách copies để chọn
-                        Toasty.info(requireContext(), "Chức năng mượn sách vật lý đang phát triển", Toasty.LENGTH_SHORT).show();
-                    } else {
-                        // Mượn sách điện tử
-                        checkEbookBorrowStatus(isbn);
-                    }
-                })
-                .setNegativeButton("Hủy", null)
-                .show();
-    }
-
-    private void checkEbookBorrowStatus(String isbn) {
-        SharedPreferences prefs = requireContext().getSharedPreferences("app_prefs", Context.MODE_PRIVATE);
-        long maDG = Long.parseLong(prefs.getString("key_userId", "0"));
-        String maSach = isbn + "-ON";
-
-        Call<ResponseSingleModel<Boolean>> call = apiService.isEbookStillBorrowed(maDG, maSach);
-        call.enqueue(new Callback<ResponseSingleModel<Boolean>>() {
-            @Override
-            public void onResponse(Call<ResponseSingleModel<Boolean>> call, Response<ResponseSingleModel<Boolean>> response) {
-                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
-                    Boolean isStillBorrowed = response.body().getData();
-
-                    if (Boolean.TRUE.equals(isStillBorrowed)) {
-                        getBookUrl(isbn);
-                    } else {
-                        showAddToCartDialog(maSach);
-                    }
-                } else {
-                    String errorMessage = "Lỗi không xác định";
-                    if (response.errorBody() != null) {
-                        try {
-                            String errorJson = response.errorBody().string();
-                            if (errorJson.contains("message")) {
-                                errorMessage = errorJson.split("\"message\":\"")[1].split("\"")[0];
-                            }
-                        } catch (Exception e) {
-                            errorMessage = "Lỗi server";
-                        }
-                    }
-                    Toasty.warning(requireContext(), errorMessage, Toasty.LENGTH_LONG).show();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ResponseSingleModel<Boolean>> call, Throwable t) {
-                Toasty.error(requireContext(), "Lỗi kết nối: " + t.getMessage(), Toasty.LENGTH_LONG).show();
-            }
-        });
-    }
-
-    private void getBookUrl(String isbn) {
-        Call<ResponseSingleModel<String>> call = apiService.getBookUrl(isbn);
-        call.enqueue(new Callback<ResponseSingleModel<String>>() {
-            @Override
-            public void onResponse(Call<ResponseSingleModel<String>> call, Response<ResponseSingleModel<String>> response) {
-                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
-                    String bookUrl = response.body().getData();
-                    if (bookUrl != null) {
-                        openEbookReader(bookUrl);
-                    } else {
-                        Toasty.error(requireContext(), "Lỗi khi tải sách", Toasty.LENGTH_LONG).show();
-                    }
-                } else {
-                    String errorMessage = "Lỗi không xác định";
-                    if (response.errorBody() != null) {
-                        try {
-                            String errorJson = response.errorBody().string();
-                            if (errorJson.contains("message")) {
-                                errorMessage = errorJson.split("\"message\":\"")[1].split("\"")[0];
-                            }
-                        } catch (Exception e) {
-                            errorMessage = "Lỗi server";
-                        }
-                    }
-                    Toasty.warning(requireContext(), errorMessage, Toasty.LENGTH_LONG).show();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ResponseSingleModel<String>> call, Throwable t) {
-                Toasty.error(requireContext(), "Lỗi kết nối: " + t.getMessage(), Toasty.LENGTH_LONG).show();
-            }
-        });
-    }
-
-    private void showAddToCartDialog(String maSachOnline) {
-        String message = "Bạn chưa sở hữu sách này. Thêm vào giỏ để mượn?";
-        
-        new MaterialAlertDialogBuilder(requireContext())
-                .setTitle("Chưa sở hữu sách")
-                .setMessage(message)
-                .setPositiveButton("Thêm vào giỏ", (dialog, which) -> 
-                    SubBookAdapter.AddBookToCartService(requireContext(), maSachOnline))
-                .setNegativeButton("Hủy", null)
-                .show();
-    }
-
-    private void openEbookReader(String bookUrl) {
-        String bookTitle = tvBookTitle.getText().toString();
-        ViewBookFragment fragment = ViewBookFragment.newInstance(bookUrl, bookTitle);
-        requireActivity().getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.fragmentClientDashboard, fragment)
-                .addToBackStack(null)
-                .commit();
     }
 }
