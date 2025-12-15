@@ -8,11 +8,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -20,17 +22,18 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.damh_library.R;
 import com.example.damh_library.adapter.client.SubBookAdapter;
-import com.example.damh_library.model.ResponseModel;
 import com.example.damh_library.model.ResponseSingleModel;
 import com.example.damh_library.model.request.BookCartRequest;
-import com.example.damh_library.model.response.BookCartResponse;
 import com.example.damh_library.model.response.BookDetailResponse;
 import com.example.damh_library.network.ApiClient;
 import com.example.damh_library.network.client.DauSachApiService;
-import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
+import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import es.dmoral.toasty.Toasty;
 import retrofit2.Call;
@@ -39,18 +42,22 @@ import retrofit2.Response;
 
 public class BookDetailFragment extends Fragment {
 
-    // Views
-    private ImageView ivBookCoverDetail;
-    private TextView tvIsbn, tvPublishDate, tvEdition, tvPageCount, tvBookSize, tvPrice, tvAuthorDetail, tvPublisherDetail, tvCategory, tvLanguage;
-    private RecyclerView rvSubBooks;
-    private MaterialButton btnReadOnline;
+    // Views theo layout XML mới
+    private Toolbar toolbar;
+    private ImageView ivBookCover;
+    private TextView tvBookTitle, tvAuthor, tvAvailability, tvISBN;
+    private TextView tvType, tvLanguage, tvPages, tvEdition, tvPublisher, tvPublishDate;
+    private TextView tvDescription, tvPrice;
+    private TextView tvBookCopiesCount;
+    private RecyclerView rvBookCopies;
+    private LinearLayout layoutEmptyBookCopies;
+    private com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton fabBorrowBook;
 
     private DauSachApiService apiService;
-    private String isbn; // ISBN từ arguments
+    private String isbn;
 
     public BookDetailFragment() {}
 
-    // Factory method để truyền ISBN
     public static BookDetailFragment newInstance(String isbn) {
         BookDetailFragment fragment = new BookDetailFragment();
         Bundle args = new Bundle();
@@ -73,30 +80,51 @@ public class BookDetailFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_book_detail, container, false);
 
-        // Ánh xạ views
-        ivBookCoverDetail = view.findViewById(R.id.ivBookCoverDetail);
-        tvIsbn = view.findViewById(R.id.tvIsbn);
-        tvCategory = view.findViewById(R.id.tvCategory);
-        tvLanguage = view.findViewById(R.id.tvLanguage);
-        tvPublishDate = view.findViewById(R.id.tvPublishDate);
-        tvEdition = view.findViewById(R.id.tvEdition);
-        tvPageCount = view.findViewById(R.id.tvPageCount);
-        tvBookSize = view.findViewById(R.id.tvBookSize);
-        tvPrice = view.findViewById(R.id.tvPrice);
-        tvAuthorDetail = view.findViewById(R.id.tvAuthorDetail);
-        tvPublisherDetail = view.findViewById(R.id.tvPublisherDetail);
-        rvSubBooks = view.findViewById(R.id.rvSubBooks);
-        btnReadOnline = view.findViewById(R.id.btnReadOnline);
-
-        // Gọi API để lấy chi tiết
+        initViews(view);
+        setupToolbar();
         fetchBookDetail();
 
-        btnReadOnline.setOnClickListener(v->
-        {
-            isEbookStillBorrowed();
-        });
-
         return view;
+    }
+
+    private void initViews(View view) {
+        // Toolbar
+        toolbar = view.findViewById(R.id.toolbar);
+        
+        // Book info
+        ivBookCover = view.findViewById(R.id.ivBookCover);
+        tvBookTitle = view.findViewById(R.id.tvBookTitle);
+        tvAuthor = view.findViewById(R.id.tvAuthor);
+        tvAvailability = view.findViewById(R.id.tvAvailability);
+        tvISBN = view.findViewById(R.id.tvISBN);
+        
+        // Detail info grid
+        tvType = view.findViewById(R.id.tvType);
+        tvLanguage = view.findViewById(R.id.tvLanguage);
+        tvPages = view.findViewById(R.id.tvPages);
+        tvEdition = view.findViewById(R.id.tvEdition);
+        tvPublisher = view.findViewById(R.id.tvPublisher);
+        tvPublishDate = view.findViewById(R.id.tvPublishDate);
+        
+        // Description and price
+        tvDescription = view.findViewById(R.id.tvDescription);
+        tvPrice = view.findViewById(R.id.tvPrice);
+        
+        // Book copies list
+        tvBookCopiesCount = view.findViewById(R.id.tvBookCopiesCount);
+        rvBookCopies = view.findViewById(R.id.rvBookCopies);
+        layoutEmptyBookCopies = view.findViewById(R.id.layoutEmptyBookCopies);
+        
+        // FAB
+        fabBorrowBook = view.findViewById(R.id.fabBorrowBook);
+    }
+
+    private void setupToolbar() {
+        if (getActivity() instanceof AppCompatActivity) {
+            ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+            ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            toolbar.setNavigationOnClickListener(v -> requireActivity().onBackPressed());
+        }
     }
 
     private void fetchBookDetail() {
@@ -111,8 +139,8 @@ public class BookDetailFragment extends Fragment {
             public void onResponse(Call<ResponseSingleModel<BookDetailResponse>> call,
                                    Response<ResponseSingleModel<BookDetailResponse>> response) {
                 if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
-                    BookDetailResponse bookDetail = (BookDetailResponse) response.body().getData(); // <-- Đây là object, không phải list!
-                    Log.e("AAA", "Lấy thành công: " + bookDetail.getTitle());
+                    BookDetailResponse bookDetail = response.body().getData();
+                    Log.d("BookDetail", "Lấy thành công: " + bookDetail.getTitle());
                     bindBookData(bookDetail);
                 } else {
                     String msg = response.body() != null ? response.body().getMessage() : "Không có dữ liệu";
@@ -122,52 +150,109 @@ public class BookDetailFragment extends Fragment {
 
             @Override
             public void onFailure(Call<ResponseSingleModel<BookDetailResponse>> call, Throwable t) {
-                Log.e("AAA", "Lỗi mạng: " + t.getMessage());
+                Log.e("BookDetail", "Lỗi mạng: " + t.getMessage());
                 Toasty.error(requireContext(), "Không kết nối được server!", Toasty.LENGTH_SHORT).show();
             }
         });
     }
 
     private void bindBookData(BookDetailResponse bookDetail) {
-        // Load cover
+        // Load cover image
         if (bookDetail.getImagePath() != null && !bookDetail.getImagePath().isEmpty()) {
             Glide.with(requireContext())
                     .load(bookDetail.getImagePath())
                     .placeholder(R.drawable.ic_book_placeholder)
                     .error(R.drawable.ic_book_placeholder)
-                    .into(ivBookCoverDetail);
+                    .into(ivBookCover);
         } else {
-            ivBookCoverDetail.setImageResource(R.drawable.ic_book_placeholder);
+            ivBookCover.setImageResource(R.drawable.ic_book_placeholder);
         }
 
-        tvIsbn.setText("ISBN: " + (bookDetail.getIsbn() != null ? bookDetail.getIsbn() : "Không rõ"));
+        // Basic info
+        tvBookTitle.setText(bookDetail.getTitle() != null ? bookDetail.getTitle() : "Không rõ tên");
+        tvAuthor.setText(bookDetail.getAuthor() != null ? bookDetail.getAuthor() : "Không rõ tác giả");
+        tvISBN.setText("ISBN: " + (bookDetail.getIsbn() != null ? bookDetail.getIsbn() : "Không rõ"));
 
-        // Badges
-        tvCategory.setText("Thể loại: " + (bookDetail.getType() != null ? bookDetail.getType() : "Không rõ"));
-        tvLanguage.setText("Ngôn ngữ: " + (bookDetail.getLanguage() != null ? bookDetail.getLanguage() : "Không rõ"));
+        // Availability status
+        int available = bookDetail.getAvailableQuantity();
+        int total = bookDetail.getQuantity();
+        tvAvailability.setText("Còn " + available + "/" + total + " cuốn");
 
-        // Mô tả
-        tvPublishDate.setText("Ngày xuất bản: " + (bookDetail.getPublishDate() != null ? bookDetail.getPublishDate() : "Không rõ"));
-        tvEdition.setText("Lần xuất bản: " + (bookDetail.getEdition() != null ? bookDetail.getEdition() : "Không rõ"));
-        tvPageCount.setText("Số trang: " + (bookDetail.getNumberOfPages() != null ? bookDetail.getNumberOfPages() : "Không rõ"));
-        tvBookSize.setText("Khổ sách: " + "Không rõ"); // Không có dữ liệu, giữ "Không rõ"
-        tvPrice.setText("Giá: " + (bookDetail.getPrice() != null ? bookDetail.getPrice() + " VNĐ" : "Không rõ"));
-        tvAuthorDetail.setText("Tác giả: " + (bookDetail.getAuthor() != null ? bookDetail.getAuthor() : "Không rõ"));
-        tvPublisherDetail.setText("Nhà xuất bản: " + (bookDetail.getPublisher() != null ? bookDetail.getPublisher() : "Không rõ"));
+        // Detail grid
+        tvType.setText(bookDetail.getType() != null ? bookDetail.getType() : "Không rõ");
+        tvLanguage.setText(bookDetail.getLanguage() != null ? bookDetail.getLanguage() : "Không rõ");
+        tvPages.setText(bookDetail.getNumberOfPages() != null ? bookDetail.getNumberOfPages().toString() : "0");
+        tvEdition.setText("Lần " + (bookDetail.getEdition() != null ? bookDetail.getEdition().toString() : "1"));
+        tvPublisher.setText(bookDetail.getPublisher() != null ? bookDetail.getPublisher() : "Không rõ");
+        
+        // Format publish date
+        String publishDate = formatDate(bookDetail.getPublishDate());
+        tvPublishDate.setText(publishDate);
 
-        Log.e("AAA", bookDetail.getBookCopies().toString());
+        // Description
+        tvDescription.setText(bookDetail.getDescription() != null ? bookDetail.getDescription() : "Chưa có mô tả");
 
-        // Danh sách bookCopies
-        SubBookAdapter subAdapter = new SubBookAdapter(requireContext(), bookDetail.getBookCopies());
-        rvSubBooks.setLayoutManager(new LinearLayoutManager(requireContext()));
-        rvSubBooks.setAdapter(subAdapter);
+        // Format price
+        String priceText = "Miễn phí";
+        if (bookDetail.getPrice() != null && bookDetail.getPrice() > 0) {
+            NumberFormat formatter = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
+            priceText = formatter.format(bookDetail.getPrice());
+        }
+        tvPrice.setText(priceText);
+
+        // Book copies list
+        setupBookCopiesList(bookDetail.getBookCopies());
+
+        // FAB click listener - chỉ chuyển qua PDF viewer
+        fabBorrowBook.setOnClickListener(v -> {
+            isEbookStillBorrowed();
+        });
+
+        // Set toolbar title
+        if (getActivity() instanceof AppCompatActivity) {
+            ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("");
+        }
+    }
+
+    private void setupBookCopiesList(List<BookDetailResponse.BookCopy> bookCopies) {
+        if (bookCopies != null && !bookCopies.isEmpty()) {
+            tvBookCopiesCount.setText(bookCopies.size() + " cuốn");
+            
+            SubBookAdapter subAdapter = new SubBookAdapter(requireContext(), bookCopies);
+            rvBookCopies.setLayoutManager(new LinearLayoutManager(requireContext()));
+            rvBookCopies.setAdapter(subAdapter);
+            
+            rvBookCopies.setVisibility(View.VISIBLE);
+            layoutEmptyBookCopies.setVisibility(View.GONE);
+        } else {
+            tvBookCopiesCount.setText("0 cuốn");
+            rvBookCopies.setVisibility(View.GONE);
+            layoutEmptyBookCopies.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private String formatDate(String isoDate) {
+        if (isoDate == null || isoDate.isEmpty()) return "Không rõ";
+        
+        try {
+            SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
+            SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy", Locale.getDefault());
+            Date date = inputFormat.parse(isoDate);
+            if (date != null) {
+                return outputFormat.format(date);
+            }
+
+        } catch (Exception e) {
+            Log.w("BookDetail", "Error parsing date: " + isoDate);
+        }
+        return "Không rõ";
     }
 
     private void isEbookStillBorrowed() {
         SharedPreferences prefs = requireContext().getSharedPreferences("app_prefs", Context.MODE_PRIVATE);
         long maDG = Long.parseLong(prefs.getString("key_userId", "0"));
 
-        String maSach = tvIsbn.getText().toString().replace("ISBN: ", "").trim() + "-ON";
+        String maSach = tvISBN.getText().toString().replace("ISBN: ", "").trim() + "-ON";
         Log.e("AAA", maSach);
 
         BookCartRequest request = new BookCartRequest( maDG, maSach);
@@ -181,7 +266,7 @@ public class BookDetailFragment extends Fragment {
 
                     if (Boolean.TRUE.equals(isStillBorrowed)) {
                         // Sách vẫn đang được mượn → không cho đọc lại
-                        getBookUrl(tvIsbn.getText().toString().replace("ISBN: ", "").trim());
+                        getBookUrl(tvISBN.getText().toString().replace("ISBN: ", "").trim());
                     } else {
                         // Cho phép đọc ebook
 
@@ -268,7 +353,8 @@ public class BookDetailFragment extends Fragment {
     private void showBookNotOwnedDialog() {
         // Build message and confirm
         String message = "Bạn đang chưa sở hữu hoặc chưa mượn sách. Thêm sách vào giỏ để mượn hoặc mua sách";
-        String maSachOnline = tvIsbn.getText().toString().replace("ISBN ", "").trim() + "-ON";
+        Log.e("AAA", tvISBN.getText().toString());
+        String maSachOnline = tvISBN.getText().toString().replace("ISBN: ", "").trim() + "-ON";
         Log.e("AAA", maSachOnline);
 
         new MaterialAlertDialogBuilder(requireContext())

@@ -27,6 +27,17 @@ public class BookListAdapter extends RecyclerView.Adapter<BookListAdapter.BookVi
         this.mostBorrowBookResponseList = mostBorrowBookResponseList;
     }
 
+    // Thêm method để update data
+    public void updateData(List<MostBorrowBookResponse> newList) {
+        this.mostBorrowBookResponseList = newList;
+        notifyDataSetChanged();
+    }
+
+    // Thêm method để lấy data hiện tại
+    public List<MostBorrowBookResponse> getData() {
+        return mostBorrowBookResponseList;
+    }
+
     @NonNull
     @Override
     public BookViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -73,20 +84,6 @@ public class BookListAdapter extends RecyclerView.Adapter<BookListAdapter.BookVi
             }
         });
 
-        holder.btnBorrow.setOnClickListener(v -> {
-            if (holder.itemView.getContext() instanceof AppCompatActivity) {
-                String pdfUrl = "https://1drv.ms/b/c/dbe75c2bffdbeb63/IQRyXUbjL_a9S4M3e6s7CL-dAfamICfMDSjSmExWdgibUFk";
-                String bookTitle = "Charlotte & Willbur";
-                ViewBookFragment fragment = ViewBookFragment.newInstance(pdfUrl, bookTitle);
-                AppCompatActivity activity = (AppCompatActivity) holder.itemView.getContext();
-                activity.getSupportFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.fragmentClientDashboard, fragment)
-                        .addToBackStack(null)
-                        .commit();
-            }
-        });
-
     }
 
     @Override
@@ -104,7 +101,7 @@ public class BookListAdapter extends RecyclerView.Adapter<BookListAdapter.BookVi
             tvBookTitle = itemView.findViewById(R.id.tvBookTitle);
             tvBookAuthor = itemView.findViewById(R.id.tvBookAuthor);
             tvQuantity = itemView.findViewById(R.id.tvQuantity);
-            btnBorrow = itemView.findViewById(R.id.btnBorrow);
+//            btnBorrow = itemView.findViewById(R.id.btnBorrow);
             ivBookCover = itemView.findViewById(R.id.ivBookCover);
             tvBookCategory = itemView.findViewById(R.id.tvBookCategory);
         }

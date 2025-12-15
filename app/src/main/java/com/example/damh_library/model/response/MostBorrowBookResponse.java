@@ -53,6 +53,16 @@ public class MostBorrowBookResponse {
         this.imagePath = imagePath;
     }
 
+    public MostBorrowBookResponse(String isbn, String title, String author, int borrowCount, int quantity, String imagePath, String type) {
+        this.isbn = isbn;
+        this.title = title;
+        this.author = author;
+        this.borrowCount = borrowCount;
+        this.quantity = quantity;
+        this.imagePath = imagePath;
+        this.type = type;
+    }
+
     public String getIsbn() {
         return isbn;
     }

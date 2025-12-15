@@ -179,15 +179,26 @@ public class CreateCheckoutFragment extends Fragment {
         long maDG = Long.parseLong(prefs.getString("key_userId", "0")); // Lấy maDG
         long maNV = 4; // Giả định maNV (thủ thư)
 
+        // Xác định thông báo thành công theo hình thức mượn
+        String successMessage;
+        if (hinhThuc == null) {
+            successMessage = "Đã tạo phiếu mượn trực tuyến thành công!";
+        } else if (hinhThuc) {
+            successMessage = "Đã tạo phiếu mượn mang về thành công!";
+        } else {
+            successMessage = "Đã tạo phiếu mượn tại chỗ thành công!";
+        }
+        
         PhieuMuonRequest request = new PhieuMuonRequest( maDG, hinhThuc, maNV, selectedBooks);
         CheckoutSlipApiService service = ApiClient.getClient().create(CheckoutSlipApiService.class);
         Call<ResponseModel<Void>> call = service.createCheckoutWithRequest(request);
         call.enqueue(new Callback<ResponseModel<Void>>() {
             @Override
             public void onResponse(Call<ResponseModel<Void>> call, Response<ResponseModel<Void>> response) {
+                
                 if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
                     Toasty.success(requireContext(),
-                            hinhThuc ? "Đã tạo phiếu mượn mang về thành công!" : "Đã tạo phiếu mượn tại chỗ thành công!",
+                            successMessage,
                             Toasty.LENGTH_LONG).show();
                     requireActivity().onBackPressed();
                 } else {
