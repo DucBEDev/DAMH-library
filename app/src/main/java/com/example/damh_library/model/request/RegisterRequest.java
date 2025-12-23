@@ -25,9 +25,9 @@ public class RegisterRequest {
     private String idCard;
 
     @SerializedName("gender")
-    private String gender;
+    private boolean gender;
 
-    public RegisterRequest(String fullName, String email, String password, String birthDate, String address, String phone, String idCard, String gender) {
+    public RegisterRequest(String fullName, String email, String password, String birthDate, String address, String phone, String idCard, boolean gender) {
         this.fullName = fullName;
         this.email = email;
         this.password = password;
@@ -94,11 +94,11 @@ public class RegisterRequest {
         this.idCard = idCard;
     }
 
-    public String getGender() {
+    public boolean getGender() {
         return gender;
     }
 
-    public void setGender(String gender) {
+    public void setGender(boolean gender) {
         this.gender = gender;
     }
 }

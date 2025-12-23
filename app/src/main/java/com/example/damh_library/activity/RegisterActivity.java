@@ -3,6 +3,7 @@ package com.example.damh_library.activity;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
 import android.widget.CheckBox;
@@ -267,12 +268,12 @@ public class RegisterActivity extends AppCompatActivity {
         String idCard = edtIdCard.getText().toString().trim();
 
         // Lấy giới tính
-        String gender = "";
+        boolean gender =true;
         int selectedGenderId = rgGender.getCheckedRadioButtonId();
         if (selectedGenderId == R.id.rbMale) {
-            gender = "Male";
+            gender = true;
         } else if (selectedGenderId == R.id.rbFemale) {
-            gender = "Female";
+            gender = false;
         }
 
         // Gọi API để đăng ký
@@ -284,6 +285,7 @@ public class RegisterActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<ResponseSingleModel<Object>> call, Response<ResponseSingleModel<Object>> response) {
                 if (response.isSuccessful() && response.body() != null) {
+                    Log.e("AAA", "onResponse: " + response.body().toString());
                     ResponseSingleModel<Object> body = response.body();
                     if (body.isSuccess()) {
                         Toasty.success(RegisterActivity.this, "Đăng ký thành công!", Toast.LENGTH_LONG).show();

@@ -1,6 +1,13 @@
 package com.example.damh_library.activity;
 
+import static android.util.Log.e;
+import static androidx.core.content.ContentProviderCompat.requireContext;
+
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
 import android.widget.Toast;
@@ -46,7 +53,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         btnSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                submitForgotPassword();
+                submitForgotPassword(edtEmail.getText().toString().trim());
             }
         });
     }
@@ -65,10 +72,20 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         return true;
     }
 
-    private void submitForgotPassword() {
+    private void saveOtp(String otp, String email) {
+        Log.e("AAA", "saveOtp: " + otp + " - " + email);
+        SharedPreferences prefs = getSharedPreferences("otp_session", Context.MODE_PRIVATE);
+        prefs.edit()
+                .putString("otp_code", otp)
+                .putString("otp_email", email)
+                .putLong("otp_timestamp", System.currentTimeMillis()) // Thời gian lưu
+                .commit(); // ← Đổi từ apply() sang commit() để lưu NGAY LẬP TỨC
+    }
+
+    private void submitForgotPassword(String email) {
         if (!validate()) return;
 
-        String email = edtEmail.getText().toString().trim();
+//        String email = edtEmail.getText().toString().trim();
         AuthApiService service = ApiClient.getClient().create(AuthApiService.class);
         ForgotPasswordRequest request = new ForgotPasswordRequest(email);
 
@@ -80,7 +97,13 @@ public class ForgotPasswordActivity extends AppCompatActivity {
                     ResponseSingleModel<Object> body = response.body();
                     if (body.isSuccess()) {
                         Toast.makeText(ForgotPasswordActivity.this, "Yêu cầu đổi mật khẩu đã được gửi. Vui lòng kiểm tra email.", Toast.LENGTH_LONG).show();
-                        finish();
+                        saveOtp(body.getData().toString(), email);
+
+                        // Chuyển sang EnterOtpActivity và truyền email
+                        Intent intent = new Intent(ForgotPasswordActivity.this, EnterOtpActivity.class);
+                        intent.putExtra("email", email); // Truyền email
+                        startActivity(intent);
+
                     } else {
                         Toast.makeText(ForgotPasswordActivity.this, body.getMessage(), Toast.LENGTH_LONG).show();
                     }

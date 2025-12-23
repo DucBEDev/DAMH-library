@@ -4,6 +4,7 @@ import com.example.damh_library.model.ResponseSingleModel;
 import com.example.damh_library.model.request.ForgotPasswordRequest;
 import com.example.damh_library.model.request.LoginRequest;
 import com.example.damh_library.model.request.RegisterRequest;
+import com.example.damh_library.model.request.UpdatePasswordRequest;
 import com.example.damh_library.model.response.LoginResponse;
 
 import retrofit2.Call;
@@ -19,4 +20,7 @@ public interface AuthApiService {
 
     @POST("admin/auth/forgot-password")
     Call<ResponseSingleModel<Object>> forgotPassword(@Body ForgotPasswordRequest request);
+
+    @POST("admin/auth/update-password")
+    Call<ResponseSingleModel<Object>> updatePassword(@Body UpdatePasswordRequest request);
 }
