@@ -86,14 +86,14 @@ public class BookDetailFragment extends Fragment {
     private void initViews(View view) {
         // Toolbar
         toolbar = view.findViewById(R.id.toolbar);
-        
+
         // Book info
         ivBookCover = view.findViewById(R.id.ivBookCover);
         tvBookTitle = view.findViewById(R.id.tvBookTitle);
         tvAuthor = view.findViewById(R.id.tvAuthor);
         tvAvailability = view.findViewById(R.id.tvAvailability);
         tvISBN = view.findViewById(R.id.tvISBN);
-        
+
         // Detail info grid
         tvType = view.findViewById(R.id.tvType);
         tvLanguage = view.findViewById(R.id.tvLanguage);
@@ -101,16 +101,16 @@ public class BookDetailFragment extends Fragment {
         tvEdition = view.findViewById(R.id.tvEdition);
         tvPublisher = view.findViewById(R.id.tvPublisher);
         tvPublishDate = view.findViewById(R.id.tvPublishDate);
-        
+
         // Description and price
         tvDescription = view.findViewById(R.id.tvDescription);
         tvPrice = view.findViewById(R.id.tvPrice);
-        
+
         // Book copies list
         tvBookCopiesCount = view.findViewById(R.id.tvBookCopiesCount);
         rvBookCopies = view.findViewById(R.id.rvBookCopies);
         layoutEmptyBookCopies = view.findViewById(R.id.layoutEmptyBookCopies);
-        
+
         // FAB
         fabBorrowBook = view.findViewById(R.id.fabBorrowBook);
     }
@@ -180,7 +180,7 @@ public class BookDetailFragment extends Fragment {
         tvPages.setText(bookDetail.getNumberOfPages() != null ? bookDetail.getNumberOfPages().toString() : "0");
         tvEdition.setText("Lần " + (bookDetail.getEdition() != null ? bookDetail.getEdition().toString() : "1"));
         tvPublisher.setText(bookDetail.getPublisher() != null ? bookDetail.getPublisher() : "Không rõ");
-        
+
         // Format publish date
         String publishDate = formatDate(bookDetail.getPublishDate());
         tvPublishDate.setText(publishDate);
@@ -201,10 +201,16 @@ public class BookDetailFragment extends Fragment {
 
         // FAB click listener - chỉ chuyển qua PDF viewer
         fabBorrowBook.setOnClickListener(v -> {
+            // IMPORTANT: Use correct PDF URL format
             String pdfUrl = "https://1drv.ms/b/c/dbe75c2bffdbeb63/IQRyXUbjL_a9S4M3e6s7CL-dAfamICfMDSjSmExWdgibUFk";
+
             String bookTitle = bookDetail.getTitle() != null ? bookDetail.getTitle() : "Sách PDF";
+
+            Log.d("BookDetail", "Opening PDF - URL: " + pdfUrl);
+            Log.d("BookDetail", "Book title: " + bookTitle);
+
             ViewBookFragment fragment = ViewBookFragment.newInstance(pdfUrl, bookTitle);
-            
+
             requireActivity().getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.fragmentClientDashboard, fragment)
@@ -221,11 +227,11 @@ public class BookDetailFragment extends Fragment {
     private void setupBookCopiesList(List<BookDetailResponse.BookCopy> bookCopies) {
         if (bookCopies != null && !bookCopies.isEmpty()) {
             tvBookCopiesCount.setText(bookCopies.size() + " cuốn");
-            
+
             SubBookAdapter subAdapter = new SubBookAdapter(requireContext(), bookCopies);
             rvBookCopies.setLayoutManager(new LinearLayoutManager(requireContext()));
             rvBookCopies.setAdapter(subAdapter);
-            
+
             rvBookCopies.setVisibility(View.VISIBLE);
             layoutEmptyBookCopies.setVisibility(View.GONE);
         } else {
@@ -237,7 +243,7 @@ public class BookDetailFragment extends Fragment {
 
     private String formatDate(String isoDate) {
         if (isoDate == null || isoDate.isEmpty()) return "Không rõ";
-        
+
         try {
             SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
             SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy", Locale.getDefault());
