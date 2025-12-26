@@ -4,6 +4,7 @@ import com.example.damh_library.model.ResponseSingleModel;
 import com.example.damh_library.model.request.BookCartRequest;
 import com.example.damh_library.model.response.BookCartResponse;
 import com.example.damh_library.model.response.BookDetailResponse;
+import com.example.damh_library.model.response.BookListResponse;
 import com.example.damh_library.model.response.MostBorrowBookResponse;
 import com.example.damh_library.model.ResponseModel;
 
@@ -33,4 +34,12 @@ public interface DauSachApiService {
     Call<ResponseSingleModel<Boolean>> isEbookStillBorrowed(@Path("maDG") long maDG, @Path("maSach") String maSach);
     @GET("admin/dausach/getBookUrl/{isbn}")
     Call<ResponseSingleModel<String>> getBookUrl(@Path("isbn") String isbn);
+
+    @GET("admin/dausach/getBooksPaginated")
+    Call<ResponseSingleModel<BookListResponse>> getBooksPaginated(
+            @Query("page") int page,
+            @Query("pageSize") int pageSize,
+            @Query("genre") String genre,
+            @Query("search") String search
+    );
 }
