@@ -1,5 +1,7 @@
 package com.example.damh_library.fragment.client;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -21,9 +23,11 @@ import com.bumptech.glide.Glide;
 import com.example.damh_library.R;
 import com.example.damh_library.adapter.client.SubBookAdapter;
 import com.example.damh_library.model.ResponseSingleModel;
+import com.example.damh_library.model.request.BookCartRequest;
 import com.example.damh_library.model.response.BookDetailResponse;
 import com.example.damh_library.network.ApiClient;
 import com.example.damh_library.network.client.DauSachApiService;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
@@ -86,14 +90,14 @@ public class BookDetailFragment extends Fragment {
     private void initViews(View view) {
         // Toolbar
         toolbar = view.findViewById(R.id.toolbar);
-
+        
         // Book info
         ivBookCover = view.findViewById(R.id.ivBookCover);
         tvBookTitle = view.findViewById(R.id.tvBookTitle);
         tvAuthor = view.findViewById(R.id.tvAuthor);
         tvAvailability = view.findViewById(R.id.tvAvailability);
         tvISBN = view.findViewById(R.id.tvISBN);
-
+        
         // Detail info grid
         tvType = view.findViewById(R.id.tvType);
         tvLanguage = view.findViewById(R.id.tvLanguage);
@@ -101,16 +105,16 @@ public class BookDetailFragment extends Fragment {
         tvEdition = view.findViewById(R.id.tvEdition);
         tvPublisher = view.findViewById(R.id.tvPublisher);
         tvPublishDate = view.findViewById(R.id.tvPublishDate);
-
+        
         // Description and price
         tvDescription = view.findViewById(R.id.tvDescription);
         tvPrice = view.findViewById(R.id.tvPrice);
-
+        
         // Book copies list
         tvBookCopiesCount = view.findViewById(R.id.tvBookCopiesCount);
         rvBookCopies = view.findViewById(R.id.rvBookCopies);
         layoutEmptyBookCopies = view.findViewById(R.id.layoutEmptyBookCopies);
-
+        
         // FAB
         fabBorrowBook = view.findViewById(R.id.fabBorrowBook);
     }
@@ -180,7 +184,7 @@ public class BookDetailFragment extends Fragment {
         tvPages.setText(bookDetail.getNumberOfPages() != null ? bookDetail.getNumberOfPages().toString() : "0");
         tvEdition.setText("Lần " + (bookDetail.getEdition() != null ? bookDetail.getEdition().toString() : "1"));
         tvPublisher.setText(bookDetail.getPublisher() != null ? bookDetail.getPublisher() : "Không rõ");
-
+        
         // Format publish date
         String publishDate = formatDate(bookDetail.getPublishDate());
         tvPublishDate.setText(publishDate);
@@ -201,21 +205,7 @@ public class BookDetailFragment extends Fragment {
 
         // FAB click listener - chỉ chuyển qua PDF viewer
         fabBorrowBook.setOnClickListener(v -> {
-            // IMPORTANT: Use correct PDF URL format
-            String pdfUrl = "https://1drv.ms/b/c/dbe75c2bffdbeb63/IQRyXUbjL_a9S4M3e6s7CL-dAfamICfMDSjSmExWdgibUFk";
-
-            String bookTitle = bookDetail.getTitle() != null ? bookDetail.getTitle() : "Sách PDF";
-
-            Log.d("BookDetail", "Opening PDF - URL: " + pdfUrl);
-            Log.d("BookDetail", "Book title: " + bookTitle);
-
-            ViewBookFragment fragment = ViewBookFragment.newInstance(pdfUrl, bookTitle);
-
-            requireActivity().getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.fragmentClientDashboard, fragment)
-                    .addToBackStack(null)
-                    .commit();
+            isEbookStillBorrowed();
         });
 
         // Set toolbar title
@@ -227,11 +217,11 @@ public class BookDetailFragment extends Fragment {
     private void setupBookCopiesList(List<BookDetailResponse.BookCopy> bookCopies) {
         if (bookCopies != null && !bookCopies.isEmpty()) {
             tvBookCopiesCount.setText(bookCopies.size() + " cuốn");
-
+            
             SubBookAdapter subAdapter = new SubBookAdapter(requireContext(), bookCopies);
             rvBookCopies.setLayoutManager(new LinearLayoutManager(requireContext()));
             rvBookCopies.setAdapter(subAdapter);
-
+            
             rvBookCopies.setVisibility(View.VISIBLE);
             layoutEmptyBookCopies.setVisibility(View.GONE);
         } else {
@@ -243,7 +233,7 @@ public class BookDetailFragment extends Fragment {
 
     private String formatDate(String isoDate) {
         if (isoDate == null || isoDate.isEmpty()) return "Không rõ";
-
+        
         try {
             SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
             SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy", Locale.getDefault());
@@ -251,9 +241,139 @@ public class BookDetailFragment extends Fragment {
             if (date != null) {
                 return outputFormat.format(date);
             }
+
         } catch (Exception e) {
             Log.w("BookDetail", "Error parsing date: " + isoDate);
         }
         return "Không rõ";
+    }
+
+    private void isEbookStillBorrowed() {
+        SharedPreferences prefs = requireContext().getSharedPreferences("app_prefs", Context.MODE_PRIVATE);
+        long maDG = Long.parseLong(prefs.getString("key_userId", "0"));
+
+        String maSach = tvISBN.getText().toString().replace("ISBN: ", "").trim() + "-ON";
+        Log.e("AAA", maSach);
+
+        BookCartRequest request = new BookCartRequest( maDG, maSach);
+        DauSachApiService service = ApiClient.getClient().create(DauSachApiService.class);
+        Call<ResponseSingleModel<Boolean>> call = service.isEbookStillBorrowed(maDG, maSach);
+        call.enqueue(new Callback<ResponseSingleModel<Boolean>>() {
+            @Override
+            public void onResponse(Call<ResponseSingleModel<Boolean>> call, Response<ResponseSingleModel<Boolean>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    Boolean isStillBorrowed = response.body().getData(); // Đây là Boolean (có thể null)
+
+                    if (Boolean.TRUE.equals(isStillBorrowed)) {
+                        // Sách vẫn đang được mượn → không cho đọc lại
+                        getBookUrl(tvISBN.getText().toString().replace("ISBN: ", "").trim());
+                    } else {
+                        // Cho phép đọc ebook
+
+                        showBookNotOwnedDialog();
+                    }
+
+                } else {
+                    // Lỗi HTTP (400, 500, v.v.) → đọc errorBody
+                    String errorMessage = "Lỗi không xác định";
+
+                    if (response.errorBody() != null) {
+                        try {
+                            String errorJson = response.errorBody().string();
+                            // Parse JSON lỗi thủ công (vì ResponseModel<Void> không match)
+                            if (errorJson.contains("message")) {
+                                // Dùng regex đơn giản hoặc Gson
+                                errorMessage = errorJson.split("\"message\":\"")[1].split("\"")[0];
+                            } else {
+                                errorMessage = errorJson;
+                            }
+                        } catch (Exception e) {
+                            errorMessage = "Lỗi server";
+                        }
+                    }
+
+                    Toasty.warning(requireContext(), errorMessage, Toasty.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseSingleModel<Boolean>> call, Throwable t) {
+                Toasty.error(requireContext(), "Lỗi kết nối: " + t.getMessage(), Toasty.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    private void getBookUrl(String isbn) {
+        Log.e("AAA", isbn);
+        DauSachApiService service = ApiClient.getClient().create(DauSachApiService.class);
+        Call<ResponseSingleModel<String>> call = service.getBookUrl(isbn);
+        call.enqueue(new Callback<ResponseSingleModel<String>>() {
+            @Override
+            public void onResponse(Call<ResponseSingleModel<String>> call, Response<ResponseSingleModel<String>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    String bookUrl = response.body().getData();
+                    if(bookUrl!=null)
+                    {
+                        openEbookReader(bookUrl);
+                    }
+                    else
+                    {
+                        Toasty.error(requireContext(), "Lỗi khi tải sách" , Toasty.LENGTH_LONG).show();
+                    }
+                } else {
+                    // Lỗi HTTP (400, 500, v.v.) → đọc errorBody
+                    String errorMessage = "Lỗi không xác định";
+
+                    if (response.errorBody() != null) {
+                        try {
+                            String errorJson = response.errorBody().string();
+                            // Parse JSON lỗi thủ công (vì ResponseModel<Void> không match)
+                            if (errorJson.contains("message")) {
+                                // Dùng regex đơn giản hoặc Gson
+                                errorMessage = errorJson.split("\"message\":\"")[1].split("\"")[0];
+                            } else {
+                                errorMessage = errorJson;
+                            }
+                        } catch (Exception e) {
+                            errorMessage = "Lỗi server";
+                        }
+                    }
+
+                    Toasty.warning(requireContext(), errorMessage, Toasty.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseSingleModel<String>> call, Throwable t) {
+                Toasty.error(requireContext(), "Lỗi kết nối: " + t.getMessage(), Toasty.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    private void showBookNotOwnedDialog() {
+        // Build message and confirm
+        String message = "Bạn đang chưa sở hữu hoặc chưa mượn sách. Thêm sách vào giỏ để mượn hoặc mua sách";
+        Log.e("AAA", tvISBN.getText().toString());
+        String maSachOnline = tvISBN.getText().toString().replace("ISBN: ", "").trim() + "-ON";
+        Log.e("AAA", maSachOnline);
+
+        new MaterialAlertDialogBuilder(requireContext())
+                .setTitle("Chưa sở hữu sách")
+                .setMessage(message)
+                .setPositiveButton("Thêm vào giỏ", (dialog, which) -> SubBookAdapter.AddBookToCartService(requireContext(), maSachOnline))
+                .setNegativeButton("Hủy", null)
+                .show();
+    }
+
+    private void openEbookReader(String bookUrl)
+    {
+        String pdf = "https://drive.google.com/file/d/1Tj-Jo1OEdWGp9f4GBKiZtUWRc4T80RGo/view";
+        String bookTitle = "Charlotte & Willbur";
+        ViewBookFragment fragment = ViewBookFragment.newInstance(bookUrl, bookTitle);
+        requireActivity().getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragmentClientDashboard, fragment)
+                .addToBackStack(null)
+                .commit();
     }
 }

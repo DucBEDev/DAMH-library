@@ -43,7 +43,6 @@
                 android:textSize="20sp"
                 android:textStyle="bold" />
         </LinearLayout>
-
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tabLayout"
             android:layout_width="match_parent"
@@ -53,13 +52,27 @@
             app:tabIndicatorColor="@color/white"
             app:tabMode="fixed"
             app:tabSelectedTextColor="@color/white"
-            app:tabTextColor="#B3FFFFFF" />
+            app:tabTextColor="#B3FFFFFF">
+
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Nội dung sách" />
+
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Trợ lý đọc sách" />
+
+        </com.google.android.material.tabs.TabLayout>
+
     </LinearLayout>
 
-    <!-- ViewPager2 để chứa các Fragment -->
+    <!-- ViewPager2 để chuyển tab -->
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/viewPager"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
 </LinearLayout>

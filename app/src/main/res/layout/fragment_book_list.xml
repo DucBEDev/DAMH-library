@@ -29,7 +29,7 @@
                 android:textColor="#1A1A1A"
                 android:layout_marginBottom="16dp" />
 
-            <!-- Search Bar Container -->
+            <!-- Search Bar -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -48,105 +48,170 @@
                     app:iconifiedByDefault="false"
                     app:queryBackground="@null"
                     app:submitBackground="@null"
-                    android:background="@android:color/transparent"
-                    android:focusable="true"
-                    android:focusableInTouchMode="true"
-                    android:clickable="true" />
+                    android:background="@android:color/transparent" />
 
             </com.google.android.material.card.MaterialCardView>
 
-        </LinearLayout>
+            <!-- Genre row -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="8dp">
 
+                <TextView
+                    android:id="@+id/tvGenreButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Thể loại"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="?attr/colorPrimary"
+                    android:padding="8dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:focusable="true" />
+
+                <LinearLayout
+                    android:id="@+id/llSelectedGenreTag"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginStart="12dp"
+                    android:visibility="gone" />
+
+            </LinearLayout>
+
+        </LinearLayout>
     </com.google.android.material.appbar.AppBarLayout>
 
-    <!-- Main Content -->
-    <androidx.core.widget.NestedScrollView
+    <!-- Content area: use vertical LinearLayout so pagination is always below the scrollable list -->
+    <LinearLayout
+        android:id="@+id/contentContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:orientation="vertical"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <FrameLayout
+        <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:fillViewport="true">
 
-            <!-- RecyclerView -->
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rvBooks"
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:clipToPadding="false"
-                android:paddingTop="8dp"
-                android:paddingBottom="16dp"
-                android:overScrollMode="never"
-                android:nestedScrollingEnabled="false" />
+                android:layout_height="wrap_content">
 
-            <!-- Empty State -->
-            <LinearLayout
-                android:id="@+id/llEmpty"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:padding="48dp"
-                android:visibility="gone">
-
-                <ImageView
-                    android:layout_width="120dp"
-                    android:layout_height="120dp"
-                    android:src="@drawable/ic_book"
-                    android:alpha="0.3"
-                    app:tint="#9E9E9E"
-                    android:contentDescription="empty_books" />
-
-                <TextView
-                    android:id="@+id/tvEmpty"
-                    android:layout_width="wrap_content"
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvBooks"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Không tìm thấy sách"
-                    android:textSize="16sp"
-                    android:textColor="#757575"
-                    android:textStyle="bold"
-                    android:layout_marginTop="16dp" />
+                    android:clipToPadding="false"
+                    android:paddingTop="8dp"
+                    android:paddingBottom="16dp" />
 
-                <TextView
-                    android:layout_width="wrap_content"
+                <!-- Empty & Loading (stay inside scroll area) -->
+                <LinearLayout
+                    android:id="@+id/llEmpty"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Thử tìm kiếm với từ khóa khác"
-                    android:textSize="14sp"
-                    android:textColor="#9E9E9E"
-                    android:layout_marginTop="4dp" />
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="48dp"
+                    android:visibility="gone">
 
-            </LinearLayout>
+                    <ImageView
+                        android:layout_width="120dp"
+                        android:layout_height="120dp"
+                        android:src="@drawable/ic_book"
+                        android:alpha="0.3"
+                        app:tint="#9E9E9E" />
 
-            <!-- Loading State -->
-            <LinearLayout
-                android:id="@+id/llLoading"
-                android:layout_width="match_parent"
+                    <TextView
+                        android:id="@+id/tvEmpty"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Không tìm thấy sách"
+                        android:textSize="16sp"
+                        android:textColor="#757575"
+                        android:textStyle="bold"
+                        android:layout_marginTop="16dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Thử tìm kiếm với từ khóa khác"
+                        android:textSize="14sp"
+                        android:textColor="#9E9E9E"
+                        android:layout_marginTop="4dp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/llLoading"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="48dp"
+                    android:visibility="gone">
+
+                    <ProgressBar
+                        android:id="@+id/progressBar"
+                        style="?android:attr/progressBarStyle"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:indeterminateTint="@color/teal_700" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Đang tải..."
+                        android:textSize="14sp"
+                        android:textColor="#757575"
+                        android:layout_marginTop="16dp" />
+                </LinearLayout>
+
+            </FrameLayout>
+        </androidx.core.widget.NestedScrollView>
+
+        <!-- Pagination is now a fixed sibling below the scroll area so it won't overlay content -->
+        <LinearLayout
+            android:id="@+id/llPagination"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:padding="12dp"
+            android:visibility="gone"
+            android:background="@android:color/transparent">
+
+            <Button
+                android:id="@+id/btnPrevPage"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:padding="48dp"
-                android:visibility="gone">
+                android:text="Trang trước"
+                android:layout_marginEnd="16dp" />
 
-                <ProgressBar
-                    android:id="@+id/progressBar"
-                    style="?android:attr/progressBarStyle"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:indeterminateTint="@color/teal_700" />
+            <TextView
+                android:id="@+id/tvPageInfo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Trang 1 / 10"
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Đang tải..."
-                    android:textSize="14sp"
-                    android:textColor="#757575"
-                    android:layout_marginTop="16dp" />
+            <Button
+                android:id="@+id/btnNextPage"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Trang sau"
+                android:layout_marginStart="16dp" />
 
-            </LinearLayout>
-
-        </FrameLayout>
-
-    </androidx.core.widget.NestedScrollView>
+        </LinearLayout>
+    </LinearLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

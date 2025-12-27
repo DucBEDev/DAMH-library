@@ -10,52 +10,35 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.damh_library.R;
-import com.example.damh_library.adapter.BookViewPagerAdapter;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ViewBookFragment extends Fragment {
 
     private static final String ARG_PDF_URL = "pdf_url";
     private static final String ARG_BOOK_TITLE = "book_title";
-    private static final String ARG_PDF_FILENAME = "pdf_filename";
 
-    private TextView tvBookTitle;
     private ImageButton btnBack;
+    private TextView tvBookTitle;
+
     private TabLayout tabLayout;
     private ViewPager2 viewPager;
-    private BookViewPagerAdapter pagerAdapter;
+
 
     public static ViewBookFragment newInstance(String pdfUrl, String bookTitle) {
         ViewBookFragment fragment = new ViewBookFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PDF_URL, pdfUrl);
         args.putString(ARG_BOOK_TITLE, bookTitle);
-
-        // Extract filename from URL or use default
-        String filename = extractFilenameFromUrl(pdfUrl);
-        args.putString(ARG_PDF_FILENAME, filename);
-
         fragment.setArguments(args);
         return fragment;
-    }
-
-    private static String extractFilenameFromUrl(String url) {
-        // For OneDrive links, use a default filename
-        if (url != null && url.contains("1drv.ms")) {
-            return "document.pdf";
-        }
-
-        // Extract filename from URL
-        if (url != null && url.contains("/")) {
-            String[] parts = url.split("/");
-            return parts[parts.length - 1];
-        }
-
-        return "document.pdf";
     }
 
     @Nullable
@@ -64,68 +47,65 @@ public class ViewBookFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_view_book, container, false);
 
-        initViews(view);
+        tabLayout = view.findViewById(R.id.tabLayout);
+        viewPager = view.findViewById(R.id.viewPager);
+
+        tvBookTitle = view.findViewById(R.id.tvBookTitle);
+        btnBack = view.findViewById(R.id.btnBack);
+
+        String pdfUrl = getArguments() != null ? getArguments().getString(ARG_PDF_URL) : null;
+        String bookTitle = getArguments() != null ? getArguments().getString(ARG_BOOK_TITLE, "Đọc sách") : "Đọc sách";
+
+        tvBookTitle.setText(bookTitle);
+
+        btnBack.setOnClickListener(v -> requireActivity().onBackPressed());
+
         setupViewPager();
-        setupListeners();
 
         return view;
     }
 
-    private void initViews(View view) {
-        tvBookTitle = view.findViewById(R.id.tvBookTitle);
-        btnBack = view.findViewById(R.id.btnBack);
-        tabLayout = view.findViewById(R.id.tabLayout);
-        viewPager = view.findViewById(R.id.viewPager);
-
-        // Set book title from arguments
-        if (getArguments() != null) {
-            String bookTitle = getArguments().getString(ARG_BOOK_TITLE, "Đọc sách");
-            tvBookTitle.setText(bookTitle);
-        }
-    }
-
     private void setupViewPager() {
-        String pdfUrl = getArguments() != null ? getArguments().getString(ARG_PDF_URL) : "";
-        String pdfFilename = getArguments() != null ? getArguments().getString(ARG_PDF_FILENAME) : "";
+        String pdf = "https://drive.google.com/file/d/1Tj-Jo1OEdWGp9f4GBKiZtUWRc4T80RGo/view";
+        ViewBookFragment.ViewPagerAdapter adapter = new ViewBookFragment.ViewPagerAdapter(this);
+        adapter.addFragment(BookContentFragment.newInstance(pdf), "Nội dung sách");
+        adapter.addFragment(PdfReaderFragment.newInstance("the-1000000-bank-note.pdf"), "Trợ lý đọc sách");
 
-        pagerAdapter = new BookViewPagerAdapter(
-                requireActivity(),
-                pdfUrl,
-                pdfFilename
-        );
-
-        viewPager.setAdapter(pagerAdapter);
-        viewPager.setOffscreenPageLimit(1); // Keep both fragments in memory
-
-        // Link TabLayout with ViewPager2
+        viewPager.setAdapter(adapter);
         new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> {
-            switch (position) {
-                case 0:
-                    tab.setText("Nội dung");
-                    tab.setIcon(R.drawable.ic_book);
-                    break;
-                case 1:
-                    tab.setText("Trợ lý AI");
-                    tab.setIcon(R.drawable.ic_book);
-                    break;
-            }
+            tab.setText(adapter.getPageTitle(position));
         }).attach();
     }
 
-    private void setupListeners() {
-        btnBack.setOnClickListener(v -> {
-            if (getActivity() != null) {
-                getActivity().onBackPressed();
-            }
-        });
-    }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        // Clean up ViewPager
-        if (viewPager != null) {
-            viewPager.setAdapter(null);
+    static class ViewPagerAdapter extends FragmentStateAdapter {
+        private final List<Fragment> fragments = new ArrayList<>();
+        private final List<String> titles = new ArrayList<>();
+
+        public ViewPagerAdapter(@NonNull Fragment fragment) {
+            super(fragment);
+
+        }
+
+        void addFragment(Fragment fragment, String title) {
+            fragments.add(fragment);
+            titles.add(title);
+        }
+
+        @NonNull @Override
+        public Fragment createFragment(int position) {
+            return fragments.get(position);
+        }
+
+        @Override
+        public int getItemCount() {
+            return fragments.size();
+        }
+
+        CharSequence getPageTitle(int position) {
+            return titles.get(position);
         }
     }
+
+
 }
