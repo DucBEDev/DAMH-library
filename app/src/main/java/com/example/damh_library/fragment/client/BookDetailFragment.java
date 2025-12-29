@@ -140,7 +140,6 @@ public class BookDetailFragment extends Fragment {
                                    Response<ResponseSingleModel<BookDetailResponse>> response) {
                 if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
                     BookDetailResponse bookDetail = response.body().getData();
-                    Log.d("BookDetail", "Lấy thành công: " + bookDetail.getTitle());
                     bindBookData(bookDetail);
                 } else {
                     String msg = response.body() != null ? response.body().getMessage() : "Không có dữ liệu";
@@ -150,7 +149,6 @@ public class BookDetailFragment extends Fragment {
 
             @Override
             public void onFailure(Call<ResponseSingleModel<BookDetailResponse>> call, Throwable t) {
-                Log.e("BookDetail", "Lỗi mạng: " + t.getMessage());
                 Toasty.error(requireContext(), "Không kết nối được server!", Toasty.LENGTH_SHORT).show();
             }
         });
@@ -243,7 +241,6 @@ public class BookDetailFragment extends Fragment {
             }
 
         } catch (Exception e) {
-            Log.w("BookDetail", "Error parsing date: " + isoDate);
         }
         return "Không rõ";
     }
@@ -253,7 +250,6 @@ public class BookDetailFragment extends Fragment {
         long maDG = Long.parseLong(prefs.getString("key_userId", "0"));
 
         String maSach = tvISBN.getText().toString().replace("ISBN: ", "").trim() + "-ON";
-        Log.e("AAA", maSach);
 
         BookCartRequest request = new BookCartRequest( maDG, maSach);
         DauSachApiService service = ApiClient.getClient().create(DauSachApiService.class);
@@ -304,7 +300,6 @@ public class BookDetailFragment extends Fragment {
     }
 
     private void getBookUrl(String isbn) {
-        Log.e("AAA", isbn);
         DauSachApiService service = ApiClient.getClient().create(DauSachApiService.class);
         Call<ResponseSingleModel<String>> call = service.getBookUrl(isbn);
         call.enqueue(new Callback<ResponseSingleModel<String>>() {
@@ -351,11 +346,8 @@ public class BookDetailFragment extends Fragment {
     }
 
     private void showBookNotOwnedDialog() {
-        // Build message and confirm
         String message = "Bạn đang chưa sở hữu hoặc chưa mượn sách. Thêm sách vào giỏ để mượn hoặc mua sách";
-        Log.e("AAA", tvISBN.getText().toString());
         String maSachOnline = tvISBN.getText().toString().replace("ISBN: ", "").trim() + "-ON";
-        Log.e("AAA", maSachOnline);
 
         new MaterialAlertDialogBuilder(requireContext())
                 .setTitle("Chưa sở hữu sách")

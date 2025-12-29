@@ -285,7 +285,6 @@ public class RegisterActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<ResponseSingleModel<Object>> call, Response<ResponseSingleModel<Object>> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    Log.e("AAA", "onResponse: " + response.body().toString());
                     ResponseSingleModel<Object> body = response.body();
                     if (body.isSuccess()) {
                         Toasty.success(RegisterActivity.this, "Đăng ký thành công!", Toast.LENGTH_LONG).show();

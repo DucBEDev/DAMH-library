@@ -59,7 +59,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:background="@drawable/gradient_policy_header"
+                android:background="@drawable/gradient_category"
                 android:padding="24dp"
                 android:gravity="center">
 

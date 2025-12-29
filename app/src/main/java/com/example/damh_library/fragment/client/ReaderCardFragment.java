@@ -6,7 +6,6 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -109,7 +108,6 @@ public class ReaderCardFragment extends Fragment {
 
             @Override
             public void onFailure(@NotNull Call<ResponseSingleModel<ReaderCardResponse>> call, @NotNull Throwable t) {
-                Log.w("ReaderCard", "fetchCardInfo failed: " + t.getMessage());
                 Toasty.error(requireContext(), "Lỗi mạng khi lấy thẻ: " + t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
@@ -139,10 +137,8 @@ public class ReaderCardFragment extends Fragment {
                     .placeholder(R.drawable.ic_user)
                     .error(R.drawable.ic_user)
                     .into(ivReaderAvatar);
-            Log.d("ReaderCard", "Avatar loaded from URL: " + avatarUrl);
         } else {
             ivReaderAvatar.setImageResource(R.drawable.ic_user);
-            Log.d("ReaderCard", "Using default avatar");
         }
 
         // compute days remaining
@@ -167,7 +163,6 @@ public class ReaderCardFragment extends Fragment {
             if (d == null) return iso;
             return out.format(d);
         } catch (ParseException e) {
-            Log.w("ReaderCard", "formatIsoToDisplay failed: " + e.getMessage());
             return iso;
         }
     }
@@ -181,7 +176,6 @@ public class ReaderCardFragment extends Fragment {
             long diff = expiry.getTime() - new Date().getTime();
             return TimeUnit.MILLISECONDS.toDays(diff);
         } catch (Exception e) {
-            Log.w("ReaderCard", "computeDaysRemaining failed: " + e.getMessage());
             return -1;
         }
     }

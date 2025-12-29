@@ -66,13 +66,11 @@ public class MostBorrowBookAdapter extends RecyclerView.Adapter<MostBorrowBookAd
                     .listener(new RequestListener<Drawable>() {
                         @Override
                         public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-                            Log.w("BookImage", "Failed to load image: " + imageUrl + " -> " + (e != null ? e.getMessage() : "unknown"));
                             return false;
                         }
 
                         @Override
                         public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-                            Log.d("BookImage", "Loaded image: " + imageUrl);
                             return false;
                         }
                     })

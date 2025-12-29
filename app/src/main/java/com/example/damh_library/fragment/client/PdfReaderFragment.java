@@ -3,7 +3,6 @@ package com.example.damh_library.fragment.client;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,7 +39,6 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class PdfReaderFragment extends Fragment {
 
-    private static final String TAG = "PdfReaderFragment";
     private static final String ARG_PDF_FILENAME = "pdf_filename";
 
     private RecyclerView rvMessages;
@@ -70,7 +68,6 @@ public class PdfReaderFragment extends Fragment {
 
         if (getArguments() != null) {
             currentPdfFilename = getArguments().getString(ARG_PDF_FILENAME, "");
-            Log.d(TAG, "PDF Filename: " + currentPdfFilename);
         }
 
         // Get user ID from SharedPreferences
@@ -185,8 +182,6 @@ public class PdfReaderFragment extends Fragment {
         // Create request with filename for PDF chat
         PdfChatRequest request = new PdfChatRequest(currentPdfFilename, messageText, userId);
 
-        Log.d(TAG, "Sending request - Filename: " + currentPdfFilename + ", Message: " + messageText);
-
         // Call API
         Call<ChatResponse> call = chatApiService.sendPdfMessage(request);
         call.enqueue(new Callback<ChatResponse>() {
@@ -200,14 +195,12 @@ public class PdfReaderFragment extends Fragment {
 
                     if (chatResponse.isSuccess()) {
                         String answer = chatResponse.getAnswer();
-                        Log.d(TAG, "Response received - Answer: " + answer);
                         addBotMessage(answer);
                     } else {
                         String errorMsg = "Không thể trả lời câu hỏi này";
                         addBotMessage(errorMsg);
                     }
                 } else {
-                    Log.e(TAG, "Response not successful: " + response.code());
                     addBotMessage("Xin lỗi, đã xảy ra lỗi. Vui lòng thử lại.");
                 }
             }
@@ -216,7 +209,6 @@ public class PdfReaderFragment extends Fragment {
             public void onFailure(@NonNull Call<ChatResponse> call,
                                   @NonNull Throwable t) {
                 showLoading(false);
-                Log.e(TAG, "API call failed: " + t.getMessage(), t);
                 addBotMessage("Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.");
             }
         });

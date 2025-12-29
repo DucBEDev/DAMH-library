@@ -19,7 +19,7 @@
             android:id="@+id/headerSection"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/teal_700"
+            android:background="@drawable/gradient_category"
             android:gravity="center"
             android:orientation="vertical"
             android:padding="24dp"

@@ -80,9 +80,7 @@ public class CheckoutHistoryListFragment extends Fragment {
         rvCheckoutHistory.setLayoutManager(new LinearLayoutManager(requireContext()));
         adapter = new CheckoutHistoryAdapter(new ArrayList<>());
         
-        // Set click listener cho sách
         adapter.setOnBookClickListener(book -> {
-            Log.d("CheckoutHistory", "Book clicked: " + book.getTenSach() + ", Code: " + book.getMaSach());
             openBookDetail(book);
         });
         
@@ -134,8 +132,6 @@ public class CheckoutHistoryListFragment extends Fragment {
         
         String userId = requireContext().getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
                 .getString("key_userId", "5");
-        
-        Log.d("CheckoutHistory", "Loading all history for user: " + userId);
 
         CheckoutSlipApiService service = ApiClient.getClient().create(CheckoutSlipApiService.class);
         Call<ResponseModel<CheckoutHistoryResponse>> call = service.getReaderCheckoutHistory(userId);
@@ -148,8 +144,6 @@ public class CheckoutHistoryListFragment extends Fragment {
         
         String userId = requireContext().getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
                 .getString("key_userId", "5");
-        
-        Log.d("CheckoutHistory", "Searching history for user: " + userId + ", maPhieu: " + maPhieu);
 
         CheckoutSlipApiService service = ApiClient.getClient().create(CheckoutSlipApiService.class);
         // Sửa lại để gọi đúng method
@@ -170,16 +164,9 @@ public class CheckoutHistoryListFragment extends Fragment {
                     
                     if (body.isSuccess() && body.getData() != null && !body.getData().isEmpty()) {
                         List<CheckoutHistoryResponse> checkouts = body.getData();
-                        Log.d("CheckoutHistory", operation + " - Found " + checkouts.size() + " records");
                         
-                        // Hiển thị dữ liệu
                         adapter.setItems(checkouts);
                         updateUI(checkouts.size(), false);
-                        
-                        // Log chi tiết từng item
-                        for (CheckoutHistoryResponse item : checkouts) {
-                            Log.d("CheckoutHistory", "Item: " + item.toString());
-                        }
                     } else {
                         // Không có dữ liệu
                         adapter.setItems(new ArrayList<>());
@@ -202,7 +189,6 @@ public class CheckoutHistoryListFragment extends Fragment {
                 adapter.setItems(new ArrayList<>());
                 updateUI(0, true);
                 
-                Log.e("CheckoutHistory", operation + " failed: " + t.getMessage(), t);
                 Toasty.error(requireContext(), "Lỗi mạng: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
@@ -238,9 +224,6 @@ public class CheckoutHistoryListFragment extends Fragment {
             String isbn = extractISBNFromBookCode(bookCode);
             
             if (isbn != null && !isbn.isEmpty()) {
-                Log.d("CheckoutHistory", "Opening book detail for ISBN: " + isbn);
-                
-                // Tạo BookDetailFragment với ISBN
                 BookDetailFragment bookDetailFragment = BookDetailFragment.newInstance(isbn);
                 
                 // Chuyển qua BookDetailFragment
@@ -253,10 +236,8 @@ public class CheckoutHistoryListFragment extends Fragment {
                 Toasty.info(requireContext(), "Đang tải chi tiết sách: " + book.getTenSach(), Toast.LENGTH_SHORT).show();
             } else {
                 Toasty.error(requireContext(), "Không thể xác định thông tin sách", Toast.LENGTH_SHORT).show();
-                Log.w("CheckoutHistory", "Cannot extract ISBN from book code: " + bookCode);
             }
         } catch (Exception e) {
-            Log.e("CheckoutHistory", "Error opening book detail: " + e.getMessage(), e);
             Toasty.error(requireContext(), "Lỗi khi mở chi tiết sách", Toast.LENGTH_SHORT).show();
         }
     }

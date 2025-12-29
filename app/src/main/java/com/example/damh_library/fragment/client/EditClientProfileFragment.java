@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -84,9 +83,7 @@ public class EditClientProfileFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         try {
-            Log.d("EditProfile", "onCreateView started");
             View view = inflater.inflate(R.layout.fragment_edit_client_profile, container, false);
-            Log.d("EditProfile", "Layout inflated successfully");
 
             initViews(view);
             setupImagePickers();
@@ -97,11 +94,8 @@ public class EditClientProfileFragment extends Fragment {
             setupButtons();
             loadUserData();
 
-            Log.d("EditProfile", "onCreateView completed successfully");
             return view;
         } catch (Exception e) {
-            Log.e("EditProfile", "Error in onCreateView: " + e.getMessage(), e);
-            // Fallback: quay về fragment trước đó
             if (getActivity() != null) {
                 getActivity().onBackPressed();
             }
@@ -111,12 +105,8 @@ public class EditClientProfileFragment extends Fragment {
 
     private void initViews(View view) {
         try {
-            Log.d("EditProfile", "initViews started");
-            
-            // Avatar
-            fabChangeAvatar = view.findViewById(R.id.fabChangeAvatar); // FloatingActionButton
+            fabChangeAvatar = view.findViewById(R.id.fabChangeAvatar);
             ivCurrentAvatar = view.findViewById(R.id.ivCurrentAvatar);
-            Log.d("EditProfile", "Avatar views initialized - FAB: " + (fabChangeAvatar != null) + ", ImageView: " + (ivCurrentAvatar != null));
 
             // Thông tin cá nhân
             etFullName = view.findViewById(R.id.etFullName);
@@ -143,10 +133,7 @@ public class EditClientProfileFragment extends Fragment {
             btnCancel = view.findViewById(R.id.btnCancel);
             btnSave = view.findViewById(R.id.btnSave);
             btnBack = view.findViewById(R.id.btnBack);
-            
-            Log.d("EditProfile", "All views initialized successfully");
         } catch (Exception e) {
-            Log.e("EditProfile", "Error in initViews: " + e.getMessage(), e);
             throw e;
         }
     }
@@ -220,18 +207,14 @@ public class EditClientProfileFragment extends Fragment {
 
     private void setupButtons() {
         try {
-            Log.d("EditProfile", "setupButtons started");
-            
             if (btnCancel != null) {
                 btnCancel.setOnClickListener(v -> {
-                    Log.d("EditProfile", "Cancel button clicked");
                     requireActivity().onBackPressed();
                 });
             }
 
             if (btnSave != null) {
                 btnSave.setOnClickListener(v -> {
-                    Log.d("EditProfile", "Save button clicked");
                     if (validateInputs()) {
                         saveProfile();
                     }
@@ -240,40 +223,27 @@ public class EditClientProfileFragment extends Fragment {
 
             if (btnBack != null) {
                 btnBack.setOnClickListener(v -> {
-                    Log.d("EditProfile", "Back button clicked");
                     requireActivity().onBackPressed();
                 });
-            } else {
-                Log.w("EditProfile", "Back button not found");
             }
 
-            // Setup FAB change avatar - Thay đổi cách set click listener
             if (fabChangeAvatar != null) {
                 fabChangeAvatar.setOnClickListener(v -> {
-                    Log.d("EditProfile", "FAB clicked - showing image picker");
                     showImagePickerDialog();
                 });
-                Log.d("EditProfile", "FAB click listener set successfully");
-            } else {
-                Log.e("EditProfile", "fabChangeAvatar is null in setupButtons");
             }
-            
-            Log.d("EditProfile", "setupButtons completed");
         } catch (Exception e) {
-            Log.e("EditProfile", "Error in setupButtons: " + e.getMessage(), e);
         }
     }
 
     private void showImagePickerDialog() {
         if (getContext() == null) {
-            Log.w("EditProfile", "Context is null, cannot show dialog");
             return;
         }
 
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
         builder.setTitle("Chọn ảnh đại diện")
                 .setItems(new String[]{"Chụp ảnh", "Chọn từ thư viện"}, (dialog, which) -> {
-                    Log.d("EditProfile", "Dialog item selected: " + which);
                     if (which == 0) {
                         openCamera();
                     } else {
@@ -512,7 +482,6 @@ public class EditClientProfileFragment extends Fragment {
                 if (imageFile != null) {
                     RequestBody requestFile = RequestBody.create(MediaType.parse("image/*"), imageFile);
                     avatarPart = MultipartBody.Part.createFormData("avatar", imageFile.getName(), requestFile);
-                    Log.d("EditProfile", "Avatar file created: " + imageFile.getName() + ", size: " + imageFile.length());
                 }
             }
 
@@ -527,9 +496,6 @@ public class EditClientProfileFragment extends Fragment {
             }
             RequestBody currentImagePathBody = RequestBody.create(MediaType.parse("text/plain"), currentImagePath);
 
-            Log.d("EditProfile", "Calling updateProfile API with userId: " + userId);
-            Log.d("EditProfile", "Has avatar: " + (avatarPart != null));
-
              // Gọi API với @Path userId thay vì @Query
             ReaderApiService service = ApiClient.getClient().create(ReaderApiService.class);
             Call<ResponseSingleModel<ReaderProfileResponse>> call = service.updateProfile(
@@ -541,8 +507,6 @@ public class EditClientProfileFragment extends Fragment {
                 @Override
                 public void onResponse(Call<ResponseSingleModel<ReaderProfileResponse>> call, 
                                      Response<ResponseSingleModel<ReaderProfileResponse>> response) {
-                    Log.d("EditProfile", "API Response code: " + response.code());
-                    
                     if (response.isSuccessful() && response.body() != null) {
                         if (response.body().isSuccess()) {
                             ReaderProfileResponse updated = response.body().getData();
@@ -562,35 +526,24 @@ public class EditClientProfileFragment extends Fragment {
                                               response.body().getMessage() : "Cập nhật thành công";
                             Toasty.success(requireContext(), successMsg, Toast.LENGTH_SHORT).show();
                             
-                            // Quay lại và refresh data
                             requireActivity().onBackPressed();
                         } else {
                             String errMsg = (response.body().getMessage() != null) ?
                                           response.body().getMessage() : "Cập nhật thất bại";
-                            Log.e("EditProfile", "API Error: " + errMsg);
                             Toasty.error(requireContext(), errMsg, Toast.LENGTH_SHORT).show();
                         }
                     } else {
-                        Log.e("EditProfile", "Response not successful: " + response.code());
-                        try {
-                            String errorBody = response.errorBody() != null ? response.errorBody().string() : "Unknown error";
-                            Log.e("EditProfile", "Error body: " + errorBody);
-                        } catch (Exception e) {
-                            Log.e("EditProfile", "Error reading error body: " + e.getMessage());
-                        }
                         Toasty.error(requireContext(), "Cập nhật thất bại (HTTP " + response.code() + ")", Toast.LENGTH_SHORT).show();
                     }
                 }
 
                 @Override
                 public void onFailure(Call<ResponseSingleModel<ReaderProfileResponse>> call, Throwable t) {
-                    Log.e("EditProfile", "API call failed: " + t.getMessage(), t);
                     Toasty.error(requireContext(), "Lỗi mạng: " + t.getMessage(), Toast.LENGTH_LONG).show();
                 }
             });
 
         } catch (Exception e) {
-            Log.e("EditProfile", "Error in updateProfile: " + e.getMessage(), e);
             Toast.makeText(requireContext(), "Lỗi xử lý dữ liệu", Toast.LENGTH_SHORT).show();
         }
     }
@@ -613,16 +566,13 @@ public class EditClientProfileFragment extends Fragment {
             inputStream.close();
             return tempFile;
         } catch (Exception e) {
-            Log.e("EditProfile", "Error creating file from URI: " + e.getMessage());
             return null;
         }
     }
 
     private void loadUserData() {
         try {
-            Log.d("EditProfile", "loadUserData started");
             String userId = requireContext().getSharedPreferences("app_prefs", Context.MODE_PRIVATE).getString("key_userId", "2");
-            Log.d("EditProfile", "Loading data for user ID: " + userId);
 
             ReaderApiService service = ApiClient.getClient().create(ReaderApiService.class);
             Call<ResponseSingleModel<ReaderProfileResponse>> call = service.getProfileInfo(userId);
@@ -630,12 +580,9 @@ public class EditClientProfileFragment extends Fragment {
                 @Override
                 public void onResponse(Call<ResponseSingleModel<ReaderProfileResponse>> call, Response<ResponseSingleModel<ReaderProfileResponse>> response) {
                     try {
-                        Log.d("EditProfile", "API response received");
                         if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
                             ReaderProfileResponse profile = response.body().getData();
-                            Log.d("EditProfile", "Profile data loaded successfully");
 
-                            // Load avatar
                             currentAvatarUrl = profile.getAvatar();
                             if (currentAvatarUrl != null && !currentAvatarUrl.isEmpty() && ivCurrentAvatar != null) {
                                 Glide.with(EditClientProfileFragment.this)
@@ -644,13 +591,9 @@ public class EditClientProfileFragment extends Fragment {
                                         .placeholder(R.drawable.ic_user)
                                         .error(R.drawable.ic_user)
                                         .into(ivCurrentAvatar);
-                                Log.d("EditProfile", "Avatar loaded from URL: " + currentAvatarUrl);
                             } else if (ivCurrentAvatar != null) {
                                 ivCurrentAvatar.setImageResource(R.drawable.ic_user);
-                                Log.d("EditProfile", "Using default avatar");
                             }
-
-                            // Fill form data
                             if (etFullName != null) etFullName.setText(profile.getHoTenDG());
                             if (actvGender != null) {
                                 if (profile.isGioiTinh()) actvGender.setText("Nam", false);
@@ -666,7 +609,6 @@ public class EditClientProfileFragment extends Fragment {
                                     java.util.Date d = input.parse(isoDate);
                                     if (d != null) displayDate = dateFormatter.format(d);
                                 } catch (Exception e) {
-                                    Log.w("EditProfile", "Failed to parse date: " + isoDate + " -> " + e.getMessage());
                                     displayDate = isoDate;
                                 }
                             }
@@ -676,15 +618,11 @@ public class EditClientProfileFragment extends Fragment {
                             if (etEmail != null) etEmail.setText(profile.getEmailDG());
                             if (etPhone != null) etPhone.setText(profile.getDienThoai());
                             if (etAddress != null) etAddress.setText(profile.getDiaChiDG());
-
-                            Log.d("EditProfile", "Form data filled successfully");
                         } else {
-                            Log.e("EditProfile", "Invalid API response");
                             Toasty.error(requireContext(), "Không thể tải thông tin profile", Toasty.LENGTH_SHORT).show();
                             requireActivity().onBackPressed();
                         }
                     } catch (Exception e) {
-                        Log.e("EditProfile", "Error processing API response: " + e.getMessage(), e);
                         Toasty.error(requireContext(), "Lỗi xử lý dữ liệu", Toast.LENGTH_SHORT).show();
                         requireActivity().onBackPressed();
                     }
@@ -692,14 +630,12 @@ public class EditClientProfileFragment extends Fragment {
 
                 @Override
                 public void onFailure(Call<ResponseSingleModel<ReaderProfileResponse>> call, Throwable t) {
-                    Log.e("EditProfile", "API call failed: " + (t != null ? t.getMessage() : "Unknown error"), t);
                     String err = t != null && t.getMessage() != null ? t.getMessage() : "Lỗi mạng";
                     Toasty.error(requireContext(), "Không thể tải profile: " + err, Toasty.LENGTH_LONG).show();
                     requireActivity().onBackPressed();
                 }
             });
         } catch (Exception e) {
-            Log.e("EditProfile", "Error in loadUserData: " + e.getMessage(), e);
             Toasty.error(requireContext(), "Lỗi khởi tạo: " + e.getMessage(), Toasty.LENGTH_SHORT).show();
             requireActivity().onBackPressed();
         }

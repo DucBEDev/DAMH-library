@@ -138,10 +138,8 @@ public class ClientProfileFragment extends Fragment {
                     .placeholder(R.drawable.ic_user)
                     .error(R.drawable.ic_user)
                     .into(ivAvatar);
-            Log.d("ClientProfile", "Avatar loaded from URL: " + profile.getAvatar());
         } else {
             ivAvatar.setImageResource(R.drawable.ic_user);
-            Log.d("ClientProfile", "Using default avatar");
         }
     }
 

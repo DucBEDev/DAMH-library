@@ -1,6 +1,5 @@
 package com.example.damh_library.adapter.client;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -69,11 +68,9 @@ public class BookListAdapter extends RecyclerView.Adapter<BookListAdapter.BookVi
             holder.ivBookCover.setImageResource(R.drawable.ic_book);
         }
 
-        // Chuyển đến BookDetailFragment khi click item
         holder.itemView.setOnClickListener(v -> {
             if (holder.itemView.getContext() instanceof AppCompatActivity) {
-                String isbn = mostBorrowBookResponse.getIsbn(); // Giả sử có getIsbn() trong model
-                Log.e("AAA", isbn);
+                String isbn = mostBorrowBookResponse.getIsbn();
                 BookDetailFragment fragment = BookDetailFragment.newInstance(isbn);
                 AppCompatActivity activity = (AppCompatActivity) holder.itemView.getContext();
                 activity.getSupportFragmentManager().beginTransaction()

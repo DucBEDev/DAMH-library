@@ -3,7 +3,6 @@ package com.example.damh_library.fragment.client;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -99,8 +98,6 @@ public class LibraryAssistantFragment extends Fragment {
                 .build();
 
         chatApiService = retrofit.create(ChatApiService.class);
-        
-        Log.d("LibraryAssistant", "Retrofit setup with Chat API URL: " + ChatApiConfig.CHAT_BASE_URL);
     }
 
     private void initViews(View view) {
@@ -174,13 +171,10 @@ public class LibraryAssistantFragment extends Fragment {
                         ChatMessage botMessage = new ChatMessage(answer, false);
                         adapter.addMessage(botMessage);
                         scrollToBottom();
-                        
-                        Log.d("ChatAssistant", "Bot response: " + answer);
                     } else {
                         showErrorMessage("Xin lỗi, tôi không thể trả lời câu hỏi này.");
                     }
                 } else {
-                    Log.e("ChatAssistant", "Response error: " + response.code());
                     showErrorMessage("Đã xảy ra lỗi khi xử lý yêu cầu.");
                 }
             }
@@ -188,7 +182,6 @@ public class LibraryAssistantFragment extends Fragment {
             @Override
             public void onFailure(Call<ChatResponse> call, Throwable t) {
                 llLoading.setVisibility(View.GONE);
-                Log.e("ChatAssistant", "API call failed: " + t.getMessage());
                 showErrorMessage("Không thể kết nối đến server. Vui lòng thử lại sau.");
             }
         });
