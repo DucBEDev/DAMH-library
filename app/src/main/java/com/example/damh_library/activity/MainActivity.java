@@ -3,6 +3,7 @@ package com.example.damh_library.activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
@@ -14,10 +15,13 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.damh_library.R;
 import com.example.damh_library.activity.client.Client_dashboard;
+import com.example.damh_library.model.ResponseSingleModel;
 import com.example.damh_library.model.request.LoginRequest;
 import com.example.damh_library.model.response.LoginResponse;
 import com.example.damh_library.network.ApiClient;
 import com.example.damh_library.network.admin.AuthApiService;
+import com.example.damh_library.network.client.CheckoutSlipApiService;
+import com.example.damh_library.network.client.DauSachApiService;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
@@ -50,6 +54,8 @@ public class MainActivity extends AppCompatActivity {
 
         initViews();
         setupListeners();
+
+        autoReturnOverdueEbooks();
     }
 
     private void initViews() {
@@ -209,6 +215,38 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<LoginResponse> call, Throwable t) {
                 Toasty.error(MainActivity.this, "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    private void autoReturnOverdueEbooks() {
+        CheckoutSlipApiService service = ApiClient.getClient().create(CheckoutSlipApiService.class);
+
+        Call<ResponseSingleModel<Integer>> call = service.autoReturnOverdueEbooks();
+        call.enqueue(new Callback<ResponseSingleModel<Integer>>() {
+            @Override
+            public void onResponse(Call<ResponseSingleModel<Integer>> call, Response<ResponseSingleModel<Integer>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    if (response.body().isSuccess()) {
+                        int returnedCount = response.body().getData() != null ? response.body().getData() : 0;
+//                        Toasty.success(MainActivity.this,
+//                                "Tự động trả " + returnedCount + " ebook quá hạn thành công!",
+//                                Toasty.LENGTH_LONG).show();
+                        Log.d("AutoReturn", "Đã tự động trả " + returnedCount + " ebook");
+                    } else {
+                        Toasty.warning(MainActivity.this,
+                                response.body().getMessage() != null ? response.body().getMessage() : "Không có ebook nào quá hạn",
+                                Toasty.LENGTH_LONG).show();
+                    }
+                } else {
+                    Toasty.error(MainActivity.this, "Lỗi server khi tự động trả ebook", Toasty.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseSingleModel<Integer>> call, Throwable t) {
+                Toasty.error(MainActivity.this, "Lỗi kết nối: " + t.getMessage(), Toasty.LENGTH_LONG).show();
+                Log.e("AutoReturn", "Lỗi gọi API: " + t.getMessage());
             }
         });
     }

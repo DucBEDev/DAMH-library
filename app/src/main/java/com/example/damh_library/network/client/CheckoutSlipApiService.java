@@ -1,6 +1,7 @@
 package com.example.damh_library.network.client;
 
 import com.example.damh_library.model.ResponseModel;
+import com.example.damh_library.model.ResponseSingleModel;
 import com.example.damh_library.model.request.PhieuMuonRequest;
 import com.example.damh_library.model.response.CheckoutHistoryResponse;
 
@@ -23,6 +24,10 @@ public interface CheckoutSlipApiService {
 
     @POST("admin/phieumuon/create")
     Call<ResponseModel<Void>> createCheckoutWithRequest(@Body PhieuMuonRequest request);
+
+    // Trong DauSachApiService hoặc AuthApiService
+    @GET("admin/phieumuon/auto-return-overdue-ebooks")
+    Call<ResponseSingleModel<Integer>> autoReturnOverdueEbooks();
 
     @POST("admin/phieumuon/{readerId}")
     Call<ResponseModel<CheckoutHistoryResponse>> createCheckout(
