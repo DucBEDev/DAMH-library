@@ -123,8 +123,6 @@ public class CheckoutHistoryAdapter extends RecyclerView.Adapter<CheckoutHistory
             holder.layoutBookInfo.setVisibility(View.GONE);
             holder.layoutExpandable.setVisibility(View.GONE);
         }
-        
-        Log.d("CheckoutAdapter", "Item: " + item.getMaPhieu() + ", Books: " + item.getSoLuongSach());
     }
 
     @Override

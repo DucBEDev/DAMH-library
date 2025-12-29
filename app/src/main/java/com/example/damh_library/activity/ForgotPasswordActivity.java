@@ -1,13 +1,11 @@
 package com.example.damh_library.activity;
 
-import static android.util.Log.e;
 import static androidx.core.content.ContentProviderCompat.requireContext;
 
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
 import android.widget.Toast;
@@ -73,7 +71,6 @@ public class ForgotPasswordActivity extends AppCompatActivity {
     }
 
     private void saveOtp(String otp, String email) {
-        Log.e("AAA", "saveOtp: " + otp + " - " + email);
         SharedPreferences prefs = getSharedPreferences("otp_session", Context.MODE_PRIVATE);
         prefs.edit()
                 .putString("otp_code", otp)

@@ -1,16 +1,10 @@
 package com.example.damh_library.fragment.client;
 
-import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebChromeClient;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.ImageButton;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -75,7 +69,7 @@ public class ViewBookFragment extends Fragment {
         String pdf = "https://drive.google.com/file/d/1Tj-Jo1OEdWGp9f4GBKiZtUWRc4T80RGo/view";
         ViewBookFragment.ViewPagerAdapter adapter = new ViewBookFragment.ViewPagerAdapter(this);
         adapter.addFragment(BookContentFragment.newInstance(pdf), "Nội dung sách");
-        adapter.addFragment(PdfReaderFragment.newInstance(), "Trợ lý đọc sách");
+        adapter.addFragment(PdfReaderFragment.newInstance("the-1000000-bank-note.pdf"), "Trợ lý đọc sách");
 
         viewPager.setAdapter(adapter);
         new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> {

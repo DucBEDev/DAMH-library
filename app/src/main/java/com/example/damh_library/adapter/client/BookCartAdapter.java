@@ -1,7 +1,6 @@
 package com.example.damh_library.adapter.client;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -137,9 +136,7 @@ public class BookCartAdapter extends RecyclerView.Adapter<BookCartAdapter.CartVi
         boolean selectable = knownAvailability ? (availableCount > 0) : true;
         holder.cbSelectBook.setEnabled(selectable);
 
-        // Load book cover image - sử dụng getImageUrl() sẽ tự động ưu tiên hinhAnhPath
         String imageUrl = book.getImageUrl();
-        Log.d("BookCartAdapter", "Loading image for: " + book.getTitle() + ", URL: " + imageUrl);
         
         if (imageUrl != null && !imageUrl.isEmpty()) {
             Glide.with(context)

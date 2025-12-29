@@ -295,7 +295,6 @@ public class BookListFragment extends Fragment {
                         isLoading = false;
                         showLoading(false);
                         showEmptyState("Lỗi kết nối mạng");
-                        Log.e("BookList", "Load page failed: " + t.getMessage());
                     }
                 });
     }

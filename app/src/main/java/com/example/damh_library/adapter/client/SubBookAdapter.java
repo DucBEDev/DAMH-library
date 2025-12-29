@@ -99,7 +99,7 @@ public class SubBookAdapter extends RecyclerView.Adapter<SubBookAdapter.ViewHold
             holder.btnAddToCart.setVisibility(View.VISIBLE);
             if(copy.getMaSach().contains("-ON"))
             {
-                holder.btnAddToCart.setText("Muượn trực tuyến");
+                holder.btnAddToCart.setText("Mượn Online");
             }
             else
             {

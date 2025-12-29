@@ -58,35 +58,35 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="@drawable/gradient_category"
+                android:gravity="center"
                 android:orientation="vertical"
-                android:background="@drawable/gradient_about_header"
-                android:padding="32dp"
-                android:gravity="center">
+                android:padding="32dp">
 
                 <ImageView
                     android:layout_width="100dp"
                     android:layout_height="100dp"
+                    android:contentDescription="Library Logo"
                     android:src="@drawable/ic_library_logo"
-                    app:tint="@android:color/white"
-                    android:contentDescription="Library Logo" />
+                    app:tint="@android:color/white" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
                     android:text="THƯ VIỆN SÁCH"
-                    android:textSize="24sp"
-                    android:textStyle="bold"
                     android:textColor="@android:color/white"
-                    android:layout_marginTop="16dp" />
+                    android:textSize="24sp"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Nơi tri thức hội tụ"
-                    android:textSize="14sp"
-                    android:textColor="@android:color/white"
+                    android:layout_marginTop="8dp"
                     android:alpha="0.9"
-                    android:layout_marginTop="8dp" />
+                    android:text="Nơi tri thức hội tụ"
+                    android:textColor="@android:color/white"
+                    android:textSize="14sp" />
 
             </LinearLayout>
 

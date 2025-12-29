@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -192,7 +191,6 @@ public class AccountFragment extends Fragment {
                         prefs.edit().putString("key_userEmail", emailProfile).apply();
                     }
 
-                    // Load avatar từ Cloudinary URL
                     if (avatarUrl != null && !avatarUrl.isEmpty()) {
                         Glide.with(AccountFragment.this)
                                 .load(avatarUrl)
@@ -200,22 +198,16 @@ public class AccountFragment extends Fragment {
                                 .placeholder(R.drawable.ic_account)
                                 .error(R.drawable.ic_account)
                                 .into(imgProfile);
-                        Log.d("AccountFragment", "Avatar loaded from URL: " + avatarUrl);
                     } else {
                         imgProfile.setImageResource(R.drawable.ic_account);
-                        Log.d("AccountFragment", "Using default avatar");
                     }
                 } else {
-                    Log.e("AccountFragment", "Failed to load profile: " + response.code());
-                    // Sử dụng avatar mặc định nếu API thất bại
                     imgProfile.setImageResource(R.drawable.ic_account);
                 }
             }
 
             @Override
             public void onFailure(Call<ResponseSingleModel<ReaderProfileResponse>> call, Throwable t) {
-                Log.e("AccountFragment", "API call failed: " + (t != null ? t.getMessage() : "Unknown error"));
-                // Sử dụng avatar mặc định nếu mạng lỗi
                 imgProfile.setImageResource(R.drawable.ic_account);
             }
         });

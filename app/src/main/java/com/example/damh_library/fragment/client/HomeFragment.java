@@ -132,34 +132,6 @@ public class HomeFragment extends Fragment {
                  if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
                      List<MostBorrowBookResponse> mostBorrowedMostBorrowBookResponses = response.body().getData();
 
-                     // Log received image URLs for debugging
-//                    for (Book b : mostBorrowedBooks) {
-//                        Log.d(TAG, "Book received: title=" + b.getTitle() + ", imagePath=" + b.getImagePath());
-//
-//                        final String img = b.getImagePath();
-//                        if (img != null && !img.isEmpty()) {
-//                            // Preload each image and log success/failure
-//                            Glide.with(requireContext())
-//                                    .asDrawable()
-//                                    .load(img)
-//                                    .listener(new RequestListener<Drawable>() {
-//                                        @Override
-//                                        public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-//                                            Log.w(TAG, "Glide preload failed for: " + img + " -> " + (e != null ? e.getMessage() : "unknown"));
-//                                            return false;
-//                                        }
-//
-//                                        @Override
-//                                        public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-//                                            Log.d(TAG, "Glide preload success for: " + img);
-//                                            return false;
-//                                        }
-//                                    })
-//                                    .preload();
-//                        }
-//                    }
-
-                     // Ensure adapter is set on main thread (Retrofit's callback already runs on main)
                      rvMostBorrowed.setAdapter(new MostBorrowBookAdapter(mostBorrowedMostBorrowBookResponses));
                  } else {
                      Toasty.error(requireContext(), response.body() != null ? response.body().getMessage() : "Lỗi khi tải sách", Toast.LENGTH_SHORT).show();
