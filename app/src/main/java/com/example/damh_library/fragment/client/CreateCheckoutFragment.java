@@ -21,6 +21,8 @@ import com.example.damh_library.model.request.PhieuMuonRequest;
 import com.example.damh_library.model.response.BookCartResponse;
 import com.example.damh_library.network.ApiClient;
 import com.example.damh_library.network.client.CheckoutSlipApiService;
+import com.example.damh_library.utils.PhieuMuonPaymentHelper;
+import com.example.damh_library.model.request.PhieuMuonPaymentRequest;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.button.MaterialButtonToggleGroup;
 
@@ -38,6 +40,9 @@ public class CreateCheckoutFragment extends Fragment {
 
     private List<BookCartResponse> selectedBooks;
     private SelectedBookCheckoutAdapter adapter;
+    
+    // Payment helper for online borrow
+    private PhieuMuonPaymentHelper paymentHelper;
 
     // Views từ layout mới
     private MaterialButtonToggleGroup toggleGroupBorrowType;
@@ -67,6 +72,9 @@ public class CreateCheckoutFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_create_checkout, container, false);
 
+        // Initialize payment helper
+        paymentHelper = new PhieuMuonPaymentHelper(requireContext());
+
         // Ánh xạ các view mới
         rvSlipDetails = view.findViewById(R.id.rvSlipDetails);
         toggleGroupBorrowType = view.findViewById(R.id.toggleGroupBorrowType);
@@ -81,16 +89,16 @@ public class CreateCheckoutFragment extends Fragment {
         tvDate = view.findViewById(R.id.tvDate);
         tvTotalBooks = view.findViewById(R.id.tvTotalBooks);
 
-        // === 1. Thiết lập thông tin độc giả & ngày lập ===
+        // Thiết lập thông tin độc giả & ngày lập
         setupUserInfo();
 
-        // === 2. Thiết lập danh sách sách ===
+        // Thiết lập danh sách sách
         setupBookList();
 
-        // === 3. Logic chọn hình thức mượn ===
+        // Logic chọn hình thức mượn
         setupBorrowTypeLogic();
 
-        // === 4. Nút hành động ===
+        // Nút hành động
         btnCancel.setOnClickListener(v -> requireActivity().onBackPressed());
 
         btnConfirmBorrow.setOnClickListener(v -> {
@@ -110,7 +118,6 @@ public class CreateCheckoutFragment extends Fragment {
                 return;
             }
 
-            // TODO: Gọi API tạo phiếu mượn ở đây
             callCreatePhieuMuonApi(hinhThuc);
         });
 
@@ -118,9 +125,10 @@ public class CreateCheckoutFragment extends Fragment {
     }
 
     private void setupUserInfo() {
-        // Giả lập thông tin người dùng (sau này lấy từ SharedPreferences hoặc API)
-        String userId = "DG" + System.currentTimeMillis() % 10000;
-        String fullName = "Nguyễn Văn A"; // Lấy từ login session
+        // Lấy thông tin người dùng từ SharedPreferences
+        SharedPreferences prefs = requireContext().getSharedPreferences("app_prefs", Context.MODE_PRIVATE);
+        String userId = prefs.getString("key_userId", "");
+        String fullName = prefs.getString("key_username", "Chưa đăng nhập");
 
         tvReaderId.setText(userId);
         tvReaderName.setText(fullName);
@@ -189,6 +197,13 @@ public class CreateCheckoutFragment extends Fragment {
             successMessage = "Đã tạo phiếu mượn tại chỗ thành công!";
         }
         
+        // Nếu là mượn online (hinhThuc == null), dùng payment
+        if (hinhThuc == null && cartType != null && cartType.equalsIgnoreCase(SubCartFragment.TYPE_ONLINE)) {
+            callCreatePhieuMuonWithPayment(maDG, maNV, successMessage);
+            return;
+        }
+        
+        // Mượn tại chỗ hoặc mang về - không cần payment
         PhieuMuonRequest request = new PhieuMuonRequest( maDG, hinhThuc, maNV, selectedBooks);
         CheckoutSlipApiService service = ApiClient.getClient().create(CheckoutSlipApiService.class);
         Call<ResponseModel<Void>> call = service.createCheckoutWithRequest(request);
@@ -212,5 +227,78 @@ public class CreateCheckoutFragment extends Fragment {
                 Toasty.error(requireContext(), "Lỗi kết nối: " + t.getMessage(), Toasty.LENGTH_LONG).show();
             }
         });
+    }
+    
+
+    // Lập phiếu mượn online với thanh toán
+    private void callCreatePhieuMuonWithPayment(long maDG, long maNV, String successMessage) {
+        // Disable button để tránh double click
+        btnConfirmBorrow.setEnabled(false);
+        btnConfirmBorrow.setText("Đang xử lý...");
+        
+        // Tính phí mượn sách (giả sử mỗi cuốn 10,000 VND)
+        int feePerBook = 10000;
+        int totalAmount = selectedBooks.size() * feePerBook;
+        
+        // Prepare danh sách sách
+        java.util.ArrayList<PhieuMuonPaymentRequest.SachItem> danhSachSach = new java.util.ArrayList<>();
+        for (BookCartResponse book : selectedBooks) {
+            danhSachSach.add(new PhieuMuonPaymentRequest.SachItem(book.getMaSach(), true));
+        }
+        
+        // Create payment request
+        PhieuMuonPaymentRequest paymentRequest = new PhieuMuonPaymentRequest(
+            (int) maDG,
+            true, // hinhThuc = true for online borrow
+            (int) maNV,
+            danhSachSach,
+            totalAmount
+        );
+        
+        // Start payment flow
+        paymentHelper.startPaymentFlow(paymentRequest, new PhieuMuonPaymentHelper.PaymentCallback() {
+            @Override
+            public void onSuccess(long orderCode) {
+                // Payment thành công & phiếu mượn đã được tạo
+                requireActivity().runOnUiThread(() -> {
+                    Toasty.success(requireContext(), 
+                        successMessage + " (Mã đơn: " + orderCode + ")", 
+                        Toasty.LENGTH_LONG).show();
+                    
+                    // Back to previous screen
+                    requireActivity().onBackPressed();
+                });
+            }
+            
+            @Override
+            public void onFailure(String message) {
+                // Payment thất bại
+                requireActivity().runOnUiThread(() -> {
+                    btnConfirmBorrow.setEnabled(true);
+                    btnConfirmBorrow.setText("Xác nhận");
+                    
+                    Toasty.error(requireContext(), 
+                        "Lỗi thanh toán: " + message, 
+                        Toasty.LENGTH_LONG).show();
+                });
+            }
+            
+            @Override
+            public void onPaymentPending(String status) {
+                // Đang chờ thanh toán
+                requireActivity().runOnUiThread(() -> {
+                    btnConfirmBorrow.setText("Đang chờ thanh toán...");
+                });
+            }
+        });
+    }
+    
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        // Cleanup payment helper
+        if (paymentHelper != null) {
+            paymentHelper.destroy();
+        }
     }
 }

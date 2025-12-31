@@ -151,8 +151,6 @@ public class MainActivity extends AppCompatActivity {
         String userName = edtUserName.getText().toString().trim();
         String password = edtPassword.getText().toString().trim();
 
-
-
         if (isCustomerMode) {
             loginAction(userName, password, "reader");
         } else {

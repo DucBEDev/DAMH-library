@@ -57,4 +57,13 @@ dependencies {
     annotationProcessor 'com.github.bumptech.glide:compiler:4.15.1'
 
     implementation 'androidx.viewpager2:viewpager2:1.0.0'
+
+    // OkHttp - HTTP client (Retrofit dependency)
+    implementation 'com.squareup.okhttp3:okhttp:4.11.0'
+
+    // Gson - JSON serialization
+    implementation 'com.google.code.gson:gson:2.10.1'
+
+    // Chrome Custom Tabs - Open payment URL
+    implementation 'androidx.browser:browser:1.7.0'
 }
