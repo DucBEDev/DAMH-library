@@ -2,9 +2,12 @@ package com.example.damh_library.fragment.client;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -24,8 +27,10 @@ import com.example.damh_library.model.ResponseModel;
 import com.example.damh_library.model.ResponseSingleModel;
 import com.example.damh_library.model.response.BookCartResponse;
 import com.example.damh_library.model.response.BorrowedBookResponse;
+import com.example.damh_library.model.response.OverdueCheckResponse;
 import com.example.damh_library.model.response.ReaderCardResponse;
 import com.example.damh_library.network.ApiClient;
+import com.example.damh_library.network.client.CheckoutSlipApiService;
 import com.example.damh_library.network.client.DauSachApiService;
 import com.example.damh_library.network.client.ReaderApiService;
 import com.google.android.material.button.MaterialButton;
@@ -50,14 +55,14 @@ public class SubCartFragment extends Fragment {
     private RecyclerView rvCartBooks;
     private LinearLayout llEmptyState, llSelectionHeader;
     private ImageButton btnBack;
-    private MaterialCheckBox cbSelectAll;
+    private CheckBox cbSelectAll;
     private TextView tvSelectedCount, tvTotalBooks;
-    private MaterialButton btnCreateBorrowTicket;
+    private Button btnCreateBorrowTicket;
     private BookCartAdapter adapter;
     private List<BookCartResponse> cartBooks;
     private ProgressBar progressLoading;
     private DauSachApiService dauSachApiService;
-    private ReaderApiService readerApiService;
+    private CheckoutSlipApiService checkoutSlipApiService;
     private CompoundButton.OnCheckedChangeListener selectAllListener;
 
     public static SubCartFragment newInstance(String type) {
@@ -108,7 +113,7 @@ public class SubCartFragment extends Fragment {
         });
 
         dauSachApiService = ApiClient.getClient().create(DauSachApiService.class);
-        readerApiService = ApiClient.getClient().create(ReaderApiService.class);
+        checkoutSlipApiService = ApiClient.getClient().create(CheckoutSlipApiService.class);
     }
 
     private void setupRecyclerView() {
@@ -228,89 +233,86 @@ public class SubCartFragment extends Fragment {
         }
     }
 
+    // <-- CẬP NHẬT: Dùng service checkReaderBorrowStatus thay vì getBorrowedBooks + getCardInfo
     private void checkConstraintsAndCreate(List<BookCartResponse> selectedBooks) {
         if (selectedBooks.isEmpty()) {
             Toasty.warning(requireContext(), "Vui lòng chọn sách để tạo phiếu mượn", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Max 3 check (also enforced in adapter)
         if (selectedBooks.size() > 3) {
-            Toasty.warning(requireContext(), "Chỉ được mượn tối đa 3 cuốn" , Toast.LENGTH_SHORT).show();
+            Toasty.warning(requireContext(), "Chỉ được mượn tối đa 3 cuốn", Toast.LENGTH_SHORT).show();
             return;
         }
 
         String userId = requireContext().getSharedPreferences("app_prefs", Context.MODE_PRIVATE).getString("key_userId", "5");
 
-        // 1) Check reader card active
-        readerApiService.getCardInfo(userId).enqueue(new Callback<ResponseSingleModel<ReaderCardResponse>>() {
-            @Override
-            public void onResponse(Call<ResponseSingleModel<ReaderCardResponse>> call, Response<ResponseSingleModel<ReaderCardResponse>> response) {
-                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
-                    ReaderCardResponse card = response.body().getData();
-                    boolean cardActive = true;
-                    if (card != null && card.getNgayHetHan() != null) {
-                        // compare ngayHetHan with today
-                        try {
-                            java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-                            sdf.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));
-                            java.util.Date expire = sdf.parse(card.getNgayHetHan());
-                            if (expire != null && new java.util.Date().after(expire)) {
-                                cardActive = false;
-                            }
-                        } catch (Exception ex) {
-                            // if unparsable, assume inactive to be safe
-                            cardActive = false;
-                        }
-                    }
+        checkoutSlipApiService.checkReaderBorrowStatus(userId)
+                .enqueue(new Callback<ResponseSingleModel<OverdueCheckResponse>>() {
+                    @Override
+                    public void onResponse(Call<ResponseSingleModel<OverdueCheckResponse>> call,
+                                           Response<ResponseSingleModel<OverdueCheckResponse>> response) {
 
-                    if (!cardActive) {
-                        Toasty.error(requireContext(), "Thẻ độc giả không hoạt động (hết hạn)", Toast.LENGTH_LONG).show();
-                        return;
-                    }
+                        // <-- CẬP NHẬT: Luôn kiểm tra response.body() trước khi dùng
+                        if (response.isSuccessful() && response.body() != null) {
+                            ResponseSingleModel<OverdueCheckResponse> body = response.body();
 
-                    // 2) Check overdue borrowed books (API returns list)
-                    readerApiService.getBorrowedBooks(userId).enqueue(new Callback<ResponseModel<BorrowedBookResponse>>() {
-                        @Override
-                        public void onResponse(Call<ResponseModel<BorrowedBookResponse>> call, Response<ResponseModel<BorrowedBookResponse>> response) {
-                            boolean hasOverdue = false;
-                            if (response.isSuccessful() && response.body() != null && response.body().isSuccess() && response.body().getData() != null) {
-                                List<BorrowedBookResponse> borrowed = response.body().getData();
-                                for (BorrowedBookResponse b : borrowed) {
-                                    if (b == null) continue;
-                                    if (b.isPastDueDate() || b.isOverdueDays(15)) {
-                                        hasOverdue = true;
-                                        break;
+                            if (body.isSuccess()) {
+                                // Được phép mượn → mở dialog xác nhận
+                                showCreateBorrowTicketDialogConfirmed(selectedBooks);
+                            } else {
+                                // Không được mượn → hiển thị thông báo phù hợp
+                                String message = body.getMessage() != null ? body.getMessage() : "Không thể mượn sách";
+                                OverdueCheckResponse data = body.getData();
+
+                                List<OverdueCheckResponse.OverdueBookInfo> overdueList = null;
+                                if (data != null) {
+                                    overdueList = data.getOverdueBooks();
+                                }
+
+                                if (overdueList != null && !overdueList.isEmpty()) {
+                                    // Có sách quá hạn → liệt kê chi tiết
+                                    StringBuilder sb = new StringBuilder();
+                                    sb.append(message).append(":\n\n");
+                                    for (OverdueCheckResponse.OverdueBookInfo book : overdueList) {
+                                        sb.append("• ").append(book.getTenSach())
+                                                .append(" - mã phiếu #").append(book.getMaPhieu())
+                                                .append("\n");
                                     }
+                                    sb.append("\nVui lòng trả sách quá hạn trước khi mượn mới.");
+
+                                    new MaterialAlertDialogBuilder(requireContext())
+                                            .setTitle("Không thể mượn sách")
+                                            .setMessage(sb.toString())
+                                            .setPositiveButton("Đóng", null)
+                                            .show();
+                                } else {
+                                    // Lỗi khác (hết hạn thẻ, khóa thẻ, v.v.)
+                                    new MaterialAlertDialogBuilder(requireContext())
+                                            .setTitle("Không thể mượn sách")
+                                            .setMessage(message)
+                                            .setPositiveButton("Đóng", null)
+                                            .show();
                                 }
                             }
-
-                            if (hasOverdue) {
-                                Toasty.error(requireContext(), "Bạn đang có sách mượn quá hạn, không thể mượn thêm", Toast.LENGTH_LONG).show();
-                                return;
+                        } else {
+                            // HTTP lỗi hoặc body null → thông báo chung
+                            String errorMsg = response.message();
+                            if (response.code() >= 400 && response.code() < 600) {
+                                errorMsg = "Lỗi server (" + response.code() + ")";
                             }
-
-                            // All constraints passed -> show confirmation and create
-                            showCreateBorrowTicketDialogConfirmed(selectedBooks);
+                            Toasty.error(requireContext(),
+                                    "Không thể kiểm tra trạng thái: " + errorMsg,
+                                    Toast.LENGTH_LONG).show();
                         }
+                    }
 
-                        @Override
-                        public void onFailure(Call<ResponseModel<BorrowedBookResponse>> call, Throwable t) {
-                            // If borrowed-book check fails (server unreachable), be conservative and block with message
-                            Toasty.error(requireContext(), "Không thể kiểm tra trạng thái mượn hiện tại. Vui lòng thử lại sau", Toast.LENGTH_LONG).show();
-                        }
-                    });
-
-                } else {
-                    Toasty.error(requireContext(), "Không thể kiểm tra thông tin thẻ độc giả", Toast.LENGTH_LONG).show();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ResponseSingleModel<ReaderCardResponse>> call, Throwable t) {
-                Toasty.error(requireContext(), "Không thể kiểm tra thông tin thẻ độc giả", Toast.LENGTH_LONG).show();
-            }
-        });
+                    @Override
+                    public void onFailure(Call<ResponseSingleModel<OverdueCheckResponse>> call, Throwable t) {
+                        Log.e("AAA", "Lỗi kết nối: " + t.getMessage());
+                        Toasty.error(requireContext(), "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                });
     }
 
     private void showCreateBorrowTicketDialog() {

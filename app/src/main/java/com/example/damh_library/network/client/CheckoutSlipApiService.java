@@ -4,6 +4,7 @@ import com.example.damh_library.model.ResponseModel;
 import com.example.damh_library.model.ResponseSingleModel;
 import com.example.damh_library.model.request.PhieuMuonRequest;
 import com.example.damh_library.model.response.CheckoutHistoryResponse;
+import com.example.damh_library.model.response.OverdueCheckResponse;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -34,5 +35,8 @@ public interface CheckoutSlipApiService {
         @Path("readerId") String readerId,
         @Query("maPhieu") String maPhieu
     );
+
+    @GET("admin/phieumuon/check-status/{maDG}")
+    Call<ResponseSingleModel<OverdueCheckResponse>> checkReaderBorrowStatus(@Path("maDG") String maDG);
 }
 
