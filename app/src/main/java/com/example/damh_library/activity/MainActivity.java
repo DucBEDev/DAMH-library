@@ -126,8 +126,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private boolean validateInputs() {
-        edtUserName.setText("docgia5");
-        edtPassword.setText("123456789");
+//        edtUserName.setText("docgia5");
+//        edtPassword.setText("123456789");
 
         boolean isValid = true;
 

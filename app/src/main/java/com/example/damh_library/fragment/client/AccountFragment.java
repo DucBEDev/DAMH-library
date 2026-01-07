@@ -142,7 +142,6 @@ public class AccountFragment extends Fragment {
     }
 
     private void loadUserData() {
-        // Load từ API thay vì chỉ SharedPreferences
         loadUserDataFromApi();
     }
 

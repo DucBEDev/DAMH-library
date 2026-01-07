@@ -9,51 +9,55 @@
     <!-- Header -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/cvHeader"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        app:cardCornerRadius="12dp"
         app:cardElevation="4dp"
-        app:cardCornerRadius="0dp"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
+            android:orientation="vertical"
             android:padding="16dp"
-            android:gravity="center_vertical"
             android:background="@drawable/gradient_category">
 
             <LinearLayout
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginStart="12dp"
-                android:orientation="vertical">
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:text="Trợ lý AI"
-                    android:textSize="18sp"
+                    android:textSize="22sp"
                     android:textStyle="bold"
-                    android:textColor="@android:color/white" />
+                    android:textColor="@android:color/white"
+                    android:fontFamily="sans-serif-medium" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Tìm kiếm sách trong thư viện"
-                    android:textSize="12sp"
-                    android:textColor="#E0E0E0"
-                    android:layout_marginTop="2dp" />
-
+                <ImageView
+                    android:src="@drawable/ic_robot"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:padding="4dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="filter"
+                    app:tint="@android:color/white" />
             </LinearLayout>
 
-            <ImageView
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:src="@drawable/ic_robot"
-                android:padding="4dp"
-                app:tint="@android:color/white" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tìm kiếm sách trong thư viện"
+                android:textSize="12sp"
+                android:textColor="#E0E0E0"
+                android:layout_marginTop="2dp" />
 
         </LinearLayout>
 
