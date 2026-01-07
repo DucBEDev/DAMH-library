@@ -146,7 +146,7 @@ public class CheckoutHistoryListFragment extends Fragment {
                 .getString("key_userId", "5");
 
         CheckoutSlipApiService service = ApiClient.getClient().create(CheckoutSlipApiService.class);
-        // Sửa lại để gọi đúng method
+
         Call<ResponseModel<CheckoutHistoryResponse>> call = service.searchCheckoutHistory(userId, maPhieu);
         
         handleApiResponse(call, "Tìm kiếm phiếu mượn");
@@ -242,10 +242,6 @@ public class CheckoutHistoryListFragment extends Fragment {
         }
     }
 
-    /**
-     * Trích xuất ISBN từ mã sách
-     * Format mã sách thường là: ISBN-XX (ví dụ: 9780000000001-01)
-     */
     private String extractISBNFromBookCode(String bookCode) {
         if (bookCode == null || bookCode.trim().isEmpty()) {
             return null;

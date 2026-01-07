@@ -25,7 +25,6 @@ public class CheckoutHistoryAdapter extends RecyclerView.Adapter<CheckoutHistory
     private List<CheckoutHistoryResponse> items;
     private OnBookClickListener onBookClickListener;
 
-    // Interface để truyền click event lên fragment
     public interface OnBookClickListener {
         void onBookClick(BookInCheckoutResponse book);
     }

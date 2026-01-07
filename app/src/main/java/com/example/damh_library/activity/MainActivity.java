@@ -63,9 +63,9 @@ public class MainActivity extends AppCompatActivity {
         tilPassword = findViewById(R.id.tilPassword);
         edtUserName = findViewById(R.id.edtUserName);
         edtPassword = findViewById(R.id.edtPassword);
-        rgUserType = findViewById(R.id.rgUserType);
-        rbCustomer = findViewById(R.id.rbCustomer);
-        rbManager = findViewById(R.id.rbManager);
+//        rgUserType = findViewById(R.id.rgUserType);
+//        rbCustomer = findViewById(R.id.rbCustomer);
+//        rbManager = findViewById(R.id.rbManager);
         btnLogin = findViewById(R.id.btnLogin);
         tvForgotPassword = findViewById(R.id.tvForgotPassword);
         tvRegister = findViewById(R.id.tvRegister);
@@ -73,18 +73,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setupListeners() {
-        rgUserType.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                if (checkedId == R.id.rbCustomer) {
-                    isCustomerMode = true;
-                    showCustomerUI();
-                } else if (checkedId == R.id.rbManager) {
-                    isCustomerMode = false;
-                    showManagerUI();
-                }
-            }
-        });
+//        rgUserType.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+//            @Override
+//            public void onCheckedChanged(RadioGroup group, int checkedId) {
+//                if (checkedId == R.id.rbCustomer) {
+//                    isCustomerMode = true;
+//                    showCustomerUI();
+//                } else if (checkedId == R.id.rbManager) {
+//                    isCustomerMode = false;
+//                    showManagerUI();
+//                }
+//            }
+//        });
 
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -126,8 +126,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private boolean validateInputs() {
-//        edtUserName.setText("docgia5");
-//        edtPassword.setText("123456789");
+        edtUserName.setText("docgia5");
+        edtPassword.setText("123456789");
 
         boolean isValid = true;
 
@@ -156,7 +156,7 @@ public class MainActivity extends AppCompatActivity {
     private void performLogin() {
         String userName = edtUserName.getText().toString().trim();
         String password = edtPassword.getText().toString().trim();
-
+        isCustomerMode = true;
         if (isCustomerMode) {
             loginAction(userName, password, "reader");
         } else {

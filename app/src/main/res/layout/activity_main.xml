@@ -38,47 +38,47 @@
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginTop="24dp" />
 
-        <TextView
-            android:id="@+id/tvUserType"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Đăng nhập với tư cách:"
-            android:textSize="16sp"
-            android:textColor="#666666"
-            android:layout_marginTop="32dp"
-            app:layout_constraintTop_toBottomOf="@id/tvTitle"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+<!--        <TextView-->
+<!--            android:id="@+id/tvUserType"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="Đăng nhập với tư cách:"-->
+<!--            android:textSize="16sp"-->
+<!--            android:textColor="#666666"-->
+<!--            android:layout_marginTop="32dp"-->
+<!--            app:layout_constraintTop_toBottomOf="@id/tvTitle"-->
+<!--            app:layout_constraintStart_toStartOf="parent"-->
+<!--            app:layout_constraintEnd_toEndOf="parent" />-->
 
-        <RadioGroup
-            android:id="@+id/rgUserType"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="8dp"
-            app:layout_constraintTop_toBottomOf="@id/tvUserType"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" >
+<!--        <RadioGroup-->
+<!--            android:id="@+id/rgUserType"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:orientation="horizontal"-->
+<!--            android:layout_marginTop="8dp"-->
+<!--            app:layout_constraintTop_toBottomOf="@id/tvUserType"-->
+<!--            app:layout_constraintStart_toStartOf="parent"-->
+<!--            app:layout_constraintEnd_toEndOf="parent" >-->
 
-            <RadioButton
-                android:id="@+id/rbCustomer"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Độc giả"
-                android:textSize="16sp"
-                android:checked="true"
-                app:buttonTint="@color/teal_700" />
+<!--            <RadioButton-->
+<!--                android:id="@+id/rbCustomer"-->
+<!--                android:layout_width="0dp"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_weight="1"-->
+<!--                android:text="Độc giả"-->
+<!--                android:textSize="16sp"-->
+<!--                android:checked="true"-->
+<!--                app:buttonTint="@color/teal_700" />-->
 
-            <RadioButton
-                android:id="@+id/rbManager"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Thủ thư"
-                android:textSize="16sp"
-                app:buttonTint="@color/teal_700" />
-        </RadioGroup>
+<!--            <RadioButton-->
+<!--                android:id="@+id/rbManager"-->
+<!--                android:layout_width="0dp"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_weight="1"-->
+<!--                android:text="Thủ thư"-->
+<!--                android:textSize="16sp"-->
+<!--                app:buttonTint="@color/teal_700" />-->
+<!--        </RadioGroup>-->
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilUserName"
@@ -91,7 +91,7 @@
             app:errorEnabled="true"
             app:startIconDrawable="@drawable/ic_user"
             app:startIconTint="@color/teal_700"
-            app:layout_constraintTop_toBottomOf="@id/rgUserType"
+            app:layout_constraintTop_toBottomOf="@id/tvTitle"
             android:layout_marginTop="24dp">
 
             <com.google.android.material.textfield.TextInputEditText
